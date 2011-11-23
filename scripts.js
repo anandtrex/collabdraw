@@ -11,8 +11,8 @@ var App;
     {
         App.datas = [];
         App.canvas = document.getElementById('whiteboard');
-        App.canvas.height = 400;
-        App.canvas.width = 800;
+        App.canvas.height = 550;
+        App.canvas.width = 920;
         document.getElementsByTagName('article')[0].appendChild(App.canvas);
         App.ctx = App.canvas.getContext("2d");
         App.ctx.fillStyle = "solid";
@@ -21,17 +21,12 @@ var App;
         App.ctx.lineCap = "round";
         App.socket = io.connect('http://128.83.74.33:4001');
 
-        App.socket.on('draw', function(data)
-        {
-            if(data == null)
-                return;
-            setParams(data.lineColor, data.lineWidth);
-            return App.draw(data.x, data.y, data.type);
-        });
-
         App.socket.emit('init', {
-            uid : "test"
+            uid : "test",
+            roomName: "one"
         });
+        
+        App.roomName = "one";
 
         /**
          * Function that does the actual drawing on the canvas
@@ -57,6 +52,7 @@ var App;
 
         App.drawAll = function(datas)
         {
+            App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
             ds = datas.datas;
             function xyz(d)
             {
@@ -80,6 +76,14 @@ var App;
 
             }
         }
+        
+        App.socket.on('draw', function(data)
+        {
+            if(data == null)
+                return;
+            setParams(data.lineColor, data.lineWidth);
+            return App.draw(data.x, data.y, data.type);
+        });
 
         App.socket.on('draw-many', App.drawAll);
 
@@ -90,8 +94,9 @@ var App;
 
         App.socket.on('madeVideo', function(uid)
         {
-            console.log("Video!");
-            $('#waitmessage').hide(500);
+            //console.log("Video!");
+            $('#waitmessage').hide(0);
+            $('#saveVideo').show(0);
             $('#html5video').html('<!-- "Video For Everybody" http://camendesign.com/code/video_for_everybody -->' + '<video controls="controls" width="800" height="400">' + '<source src="test/test.mp4" type="video/mp4" />' + '<source src="test/test.webm" type="video/webm" />' + '<span title="No video playback capabilities, please download the video below">Your browser does not support HTML5!</span>' + '</video>' + '<p><strong>Download video:</strong> <a href="test/test.mp4">MP4 format</a> | <a href="test/test.webm">WebM format</a></p>');
         });
 
@@ -141,18 +146,23 @@ var App;
     $('canvas').live('touchstart touchmove touchend', function(e)
     {
         //console.log(e);
-        e.preventDefault();
         type = e.handleObj.origType;
         f = e.originalEvent;
-        //console.log(f.touches[0]);
-        touch = f.touches[0];
-        offset = $(this).offset();
-        e.offsetX = touch.pageX - offset.left;
-        e.offsetY = touch.pageY - offset.top;
-        //alert(touch.clientX);
-        x = e.offsetX;
-        y = e.offsetY;
-        drawAndSend(x, y, type, App.ctx.strokeStyle, App.ctx.lineWidth);
+        if(f.touches.length <= 1)
+        {
+            e.preventDefault();
+            touch = f.touches[0];
+            offset = $(this).offset();
+            e.offsetX = touch.pageX - offset.left;
+            e.offsetY = touch.pageY - offset.top;
+            //alert(touch.clientX);
+            x = e.offsetX;
+            y = e.offsetY;
+            drawAndSend(x, y, type, App.ctx.strokeStyle, App.ctx.lineWidth);
+            return false;    
+        } else {
+            return true;
+        }
     });
     /**
      * Other user events
@@ -177,52 +187,46 @@ var App;
 
     $('#getVideo').live('click', function()
     {
-        $('#waitmessage').show(500);
+        $('#waitmessage').show(0);
         $('#html5video').html('<img src="img/ajax-loader.gif" />');
         App.socket.emit('video', {
             uid : "test"
         });
+        App.socket.on('message', function(data){
+            alert(data.message);
+            $('#html5video').html("");
+            $('#waitmessage').hide(0);
+        });
     });
 
-    $('#doSave').live('click', function()
+    $('#save').live('click', function()
     {
         App.socket.emit('saveCanvas', {
             uid : "test",
-            canvasName : $("#saveName").val()
+            canvasName : App.roomName
         });
-        $("#saveNameDialog").modal('hide');
     });
 
-    $('#cancelSave').live('click', function()
-    {
-        $("#saveNameDialog").modal('hide');
+    $('#join').live('click', function(){
+        $("#joinRoom").val(App.roomName);
     });
 
-    $('#fullScreen').live('click', function()
+    $('#doJoin').live('click', function()
     {
-        //$('#canvasDiv').css('height',100);
-        //        document.getElementById('whiteboard').webkitEnterFullscreen();
-        //console.log(JSON.stringify(App.datas));
-        //console.log($(window).width());
-        
-        var oldCanvas = canvas.toDataURL("image/png");
-        var img = new Image();
-        img.src = oldCanvas;       
-        App.canvas.height = $(window).height();
-        App.canvas.width = $(window).width();
-        App.ctx.restore();
-        /*
-        console.log("Done resizing canvas");
-        console.log("Clearing canvas now");
-        App.ctx.clearRect(0, 0, App.canvas.width, App.canvas.height);
-        console.log("Redrawing with data " + JSON.stringify(App.datas));
-        App.drawAll(App.datas);*/
-       /*
-       App.ctx.save();
-       App.ctx.scale(2,2);
-       App.ctx.restore();*/
-       //App.drawAll(App.datas);
+        //console.log("Joining room "+$("#joinRoom").val());
+        App.socket.emit('init', {
+            uid : "test",
+            roomName : $("#joinRoom").val()
+        });
+        App.roomName = $("#joinRoom").val();
+        $("#joinRoomDialog").modal('hide');
     });
+
+    $('#cancelJoin').live('click', function()
+    {
+        $("#joinRoomDialog").modal('hide');
+    });
+    
     /*
      * Initialize. Entry point.
      */

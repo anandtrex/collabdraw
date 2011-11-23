@@ -10,7 +10,12 @@
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <!-- Le styles -->
-        <!--<link href="css/bootstrap.min.css" rel="stylesheet">-->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+        
+        <link media="only screen and (max-device-width: 480px)" href="css/ipad.css" rel="stylesheet">
+        <link media="screen and (min-device-width: 481px)" href="css/bootstrap.min.css" rel="stylesheet">
+        
         <link href="css/style.css" rel="stylesheet">
         <!--
         <style type="text/css">
@@ -121,35 +126,39 @@
                         <button class='btn primary' id='getVideo'>
                             Get Video
                         </button>
-                        <button class='btn primary' data-controls-modal="saveNameDialog" id='save'>
-                            Save...
+                        <button class='btn primary' id='save'>
+                            Save
                         </button>
-                        <button class='btn primary' id='fullScreen'>
-                            Full Screen
+                        <button class='btn primary' data-controls-modal="joinRoomDialog" id='join'>
+                            Create/Join Room...
                         </button>
-                        <div id="saveNameDialog" class="modal fade span6">
+                        <div id="joinRoomDialog" class="modal fade span6">
                             <div class='modal-header'>
                                 <a class="close" href="#">×</a>
-                                <h3>Save your whiteboard</h3>
+                                <h3>Enter Room name. </h3>
+                                <p>If the room doesn't exist already in your account, it will be created.</p>
                             </div>
                             <div class='modal-body'>
-                                <label for='saveName'>Whiteboard name:</label>
+                                <label for='joinRoom'>Room name:</label>
                                 <div class='input'>
-                                    <input type='text' name='saveName' id="saveName" />
+                                    <input type='text' name='joinRoom' id="joinRoom" />
                                 </div>
                             </div>
                             <div class='modal-footer'>
-                                <a href="#" class="btn primary" id="doSave">Save</a>
-                                <a href="#" class="btn secondary" id="cancelSave">Cancel</a>
+                                <a href="#" class="btn primary" id="doJoin">Join</a>
+                                <a href="#" class="btn secondary" id="cancelJoin">Cancel</a>
                             </div>
                         </div>
-                    </div>
+                    </div>  
                     <div class="row">
                         <div class="span16" style="min-height: 0px">
                             <div id="waitmessage" class="alert-message info fade in span10" style="display: none; min-height: 0">
                                 Please be patient. This may take some time.
                             </div>
                             <div id="html5video"></div>
+                            <button class='btn primary' id='saveVideo' style="display:none">
+                                Save current video
+                            </button>
                         </div>
                     </div>
                 </div>
