@@ -16,19 +16,27 @@
         var server = new mongodb.Server("127.0.0.1", 27017, {});
         var db_connector = new mongodb.Db("coll_canv", server, {});
 
-        socket.on('drawClick', function(data)
+        socket.on('drawClick', function(input)
         {
-            var datas = roomDatas[socket.room];
-            console.log("Datas: "+JSON.stringify(datas));
-            console.log("Length of data:"+datas.length);
-            roomDatas[socket.room][datas.length] = data;
+            console.log("Receiving path");
+            var singlePath = input.singlePath;
+            var data = {};
+            for (d in singlePath){
+                data = singlePath[d];
+                //console.log("Datas: "+JSON.stringify(datas));
+                var datas = roomDatas[socket.room];
+                // console.log("Length of data:"+datas.length);
+                roomDatas[socket.room][datas.length] = data;
             //i++;
+            }
             socket.broadcast.to(socket.room).emit('draw', {
-                x : data.x,
-                y : data.y,
-                type : data.type,
-                lineColor : data.lineColor,
-                lineWidth : data.lineWidth,
+                singlePath : singlePath,
+                /*
+                    x : data.x,
+                    y : data.y,
+                    type : data.type,
+                    lineColor : data.lineColor,
+                    lineWidth : data.lineWidth,*/
             });
         });
 

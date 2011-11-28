@@ -20,6 +20,8 @@ var App;
         App.ctx.lineWidth = 3;
         App.ctx.lineCap = "round";
         App.socket = io.connect('http://128.83.74.33:4001');
+        
+        App.singlePath = [];
 
         App.socket.emit('init', {
             uid : "test",
@@ -77,12 +79,21 @@ var App;
             }
         }
         
-        App.socket.on('draw', function(data)
+        App.socket.on('draw', function(input)
         {
-            if(data == null)
-                return;
-            setParams(data.lineColor, data.lineWidth);
-            return App.draw(data.x, data.y, data.type);
+            //console.log("Input: "+JSON.stringify(input));
+            var sPath = input.singlePath.singlePath;
+            //console.log("Single Path: "+JSON.stringify(sPath));
+            var data = {};
+            for(d in sPath){
+                data = sPath[d];
+                // console.log("This is a data"+JSON.stringify(sPath[d]));
+                if(data == null)
+                    continue;
+                setParams(data.lineColor, data.lineWidth);
+                App.draw(data.x, data.y, data.type);
+            }
+            return;
         });
 
         App.socket.on('draw-many', App.drawAll);
@@ -114,14 +125,42 @@ var App;
      */
     var drawAndSend = function(x, y, type, lineColor, lineWidth)
     {
+        console.log("In draw and snd");
         App.draw(x, y, type);
-        App.socket.emit('drawClick', {
+        
+        if(type === "dragstart" || type === "touchstart"){
+            App.singlePath = [];
+        }
+        // Append data to the array
+        App.singlePath[App.singlePath.length] = {
             x : x,
             y : y,
             type : type,
             lineColor : lineColor,
             lineWidth : lineWidth
-        });
+        };
+        
+        
+
+        if(type === "dragend" || type === "touchend") {
+            console.log("Sending path");
+            App.socket.emit('drawClick', {
+                singlePath : App.singlePath,
+                /*
+                 x : x,
+                 y : y,
+                 type : type,
+                 lineColor : lineColor,
+                 lineWidth : lineWidth*/
+            });
+            /*
+            console.log("This the singlePath array being sent: " + JSON.stringify(App.singlePath));
+            for(d in App.singlePath) {
+                console.log("This is the data: " + JSON.stringify(App.singlePath[d]));
+            }*/
+        }
+
+        console.log("Leaving draw and sdn");
     }
     var setParams = function(lineColor, lineWidth)
     {
@@ -145,24 +184,31 @@ var App;
 
     $('canvas').live('touchstart touchmove touchend', function(e)
     {
-        //console.log(e);
+
         type = e.handleObj.origType;
         f = e.originalEvent;
-        if(f.touches.length <= 1)
-        {
+        if(f.touches.length <= 1) {
             e.preventDefault();
             touch = f.touches[0];
-            offset = $(this).offset();
-            e.offsetX = touch.pageX - offset.left;
-            e.offsetY = touch.pageY - offset.top;
-            //alert(touch.clientX);
-            x = e.offsetX;
-            y = e.offsetY;
+            
+            if(touch) {
+                offset = $(this).offset();
+                e.offsetX = touch.pageX - offset.left;
+                e.offsetY = touch.pageY - offset.top;
+                x = e.offsetX;
+                y = e.offsetY;
+            }
+            else {
+                x = null;
+                y = null;
+            }
+
             drawAndSend(x, y, type, App.ctx.strokeStyle, App.ctx.lineWidth);
-            return false;    
+            return false;
         } else {
             return true;
         }
+
     });
     /**
      * Other user events
