@@ -125,7 +125,7 @@ var App;
      */
     var drawAndSend = function(x, y, type, lineColor, lineWidth)
     {
-        console.log("In draw and snd");
+        //console.log("In draw and snd");
         App.draw(x, y, type);
         
         if(type === "dragstart" || type === "touchstart"){
@@ -142,7 +142,8 @@ var App;
         
         
 
-        if(type === "dragend" || type === "touchend") {
+        if(type === "dragend" || type === "touchend" || 
+        App.singlePath.length > 10) {
             console.log("Sending path");
             App.socket.emit('drawClick', {
                 singlePath : App.singlePath,
@@ -153,6 +154,7 @@ var App;
                  lineColor : lineColor,
                  lineWidth : lineWidth*/
             });
+            App.singlePath = [];
             /*
             console.log("This the singlePath array being sent: " + JSON.stringify(App.singlePath));
             for(d in App.singlePath) {
@@ -160,7 +162,7 @@ var App;
             }*/
         }
 
-        console.log("Leaving draw and sdn");
+        //console.log("Leaving draw and sdn");
     }
     var setParams = function(lineColor, lineWidth)
     {
