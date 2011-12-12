@@ -24,9 +24,8 @@
             for (d in singlePath){
                 data = singlePath[d];
                 //console.log("Datas: "+JSON.stringify(datas));
-                var datas = roomDatas[socket.room];
                 // console.log("Length of data:"+datas.length);
-                roomDatas[socket.room][datas.length] = data;
+                roomDatas[socket.room].push(data);
             //i++;
             }
             socket.broadcast.to(socket.room).emit('draw', {
@@ -42,7 +41,7 @@
 
         socket.on('init', function(data)
         {
-
+            console.log("Initializing");
             //console.log("data: " + JSON.stringify(data));
             // TODO compress datas before emitting
             if(socket.room) {
@@ -52,7 +51,9 @@
             console.log("Joining room " + data.roomName);
             socket.join(data.roomName);
             socket.room = data.roomName;
+            //roomDatas[socket.room] = [];
             if(!roomDatas[socket.room]) {
+                roomDatas[socket.room] = [];
                 // console.log("data: " + JSON.stringify(data));
                 console.log("Getting data from db");
 
@@ -213,7 +214,7 @@
                     console.log(stdout);
                     console.log(error);
                     console.log(stderr);
-                    socket.emit('madeVideo', {
+                    socket.emit('made-video', {
                         uid : uid,
                     });
                 }
@@ -227,7 +228,7 @@
         /**
          * Saves the canvas
          */
-        socket.on('saveCanvas', function(data)
+        socket.on('save-canvas', function(data)
         {
             console.log("Saving canvas");
             db_connector.open(function(error, client)
@@ -250,7 +251,7 @@
                     timestamp : new Date().getTime()
                 });
                 console.log("Done inserting!");
-                socket.emit('savedCanvas', {
+                socket.emit('saved-canvas', {
                     uid : uid,
                 });
                 //client.close();

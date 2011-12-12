@@ -25,7 +25,7 @@ var App;
 
         App.socket.emit('init', {
             uid : "test",
-            roomName: "one"
+            roomName: "one",
         });
         
         App.roomName = "one";
@@ -81,9 +81,9 @@ var App;
         
         App.socket.on('draw', function(input)
         {
-            //console.log("Input: "+JSON.stringify(input));
-            var sPath = input.singlePath.singlePath;
-            //console.log("Single Path: "+JSON.stringify(sPath));
+            // console.log("Input: "+JSON.stringify(input));
+            var sPath = input.singlePath;
+            // console.log("Single Path: "+JSON.stringify(sPath));
             var data = {};
             for(d in sPath){
                 data = sPath[d];
@@ -132,37 +132,29 @@ var App;
             App.singlePath = [];
         }
         // Append data to the array
-        App.singlePath[App.singlePath.length] = {
+        App.singlePath.push({
             x : x,
             y : y,
             type : type,
             lineColor : lineColor,
             lineWidth : lineWidth
-        };
+        });
         
-        
-
-        if(type === "dragend" || type === "touchend" || 
-        App.singlePath.length > 10) {
-            console.log("Sending path");
+        if(type === "dragend" || type === "touchend" || App.singlePath.length > 1) {
+            //console.log("Sending path");
+            //App.singlePath[2].type="drag";
+            //App.singlePath[App.singlePath.length-1].type="dragend";
+            var lastPoint = App.singlePath[App.singlePath.length-1];
             App.socket.emit('drawClick', {
                 singlePath : App.singlePath,
-                /*
-                 x : x,
-                 y : y,
-                 type : type,
-                 lineColor : lineColor,
-                 lineWidth : lineWidth*/
             });
+            // console.log("This the singlePath array being sent: " + JSON.stringify(App.singlePath));
             App.singlePath = [];
-            /*
-            console.log("This the singlePath array being sent: " + JSON.stringify(App.singlePath));
-            for(d in App.singlePath) {
-                console.log("This is the data: " + JSON.stringify(App.singlePath[d]));
-            }*/
+            //App.singlePath.push(lastPoint);
+            //App.singlePath.push(lastPoint);
+            //App.singlePath[0].type="dragstart";
+            //App.singlePath[1].type="drag";
         }
-
-        //console.log("Leaving draw and sdn");
     }
     var setParams = function(lineColor, lineWidth)
     {
