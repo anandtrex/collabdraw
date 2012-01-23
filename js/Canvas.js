@@ -1,3 +1,5 @@
+Ext.require('Whiteboard.MessageEvent');
+
 Ext.define('Whiteboard.Canvas',{
     cvs : 'undefined',
     cx : 'undefined',

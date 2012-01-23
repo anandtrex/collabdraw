@@ -5,6 +5,7 @@ Ext.define('Whiteboard.Connection',{
     currentPathLength: 0,
     uid: 'undefined',
     roomName : 'undefined',
+    messageEvent: 'undefined',
     
     constructor: function(address, whiteboard){
         this.whiteboard = whiteboard;
@@ -18,8 +19,8 @@ Ext.define('Whiteboard.Connection',{
             spr.remoteDraw(spr, data);
         });
         this.socket.on('draw-many', function(data){
-            console.log('draw-many event seen');
-            console.log('data is '+data);
+            //console.log('draw-many event seen');
+            //console.log('data is '+data);
             spr.remoteDrawMany(spr, data);
         });
         this.socket.on('clear', function(data){
@@ -30,6 +31,35 @@ Ext.define('Whiteboard.Connection',{
         });
         this.socket.on('saved-canvas', function(data){
             spr.remoteSavedCanvas(spr, data);
+        });
+        
+        this.messageEvent = Ext.create('Whiteboard.MessageEvent', {
+            listeners: {
+                showMessage: function(message){
+                    var overlay = Ext.create('Ext.Panel', {
+                        //floating        : false,
+                        //modal           : false,
+                        hidden          : true,
+                        height          : 30,
+                        width           : '50%',
+                        contentEl       : 'content',
+                        styleHtmlContent: true,
+                        scrollable      : false,
+                        style: 'background-color: #FFFFCC; text-align: center;',
+                        docked: "top",
+                        listeners: {
+                            show: function () {
+                                setTimeout(function(){overlay.hide()}, 3000);    
+                            },
+                        },
+                        setMessage: function(message){
+                            this.setHtml("<p>"+message+"</p>");
+                        }
+                    });
+                    overlay.setMessage(message);
+                    overlay.show();
+                }
+            }
         });
     },
     
@@ -79,9 +109,9 @@ Ext.define('Whiteboard.Connection',{
     },
     
     remoteDrawMany: function(self, data){
-        console.log('function remoteDrawMany');
-        console.log('data length is '+data.length);
-        console.log(data);
+        //console.log('function remoteDrawMany');
+        //console.log('data length is '+data.length);
+        //console.log(data);
         self.whiteboard.clear();
         ds = data.datas;
         for(d in ds){
@@ -106,6 +136,7 @@ Ext.define('Whiteboard.Connection',{
     
     remoteSavedCanvas: function(self, data){
         // show dialog box to say that the canvas has been saved
+        this.messageEvent.fireEvent('showMessage', "Canvas saved");
     },
     
     save: function(){

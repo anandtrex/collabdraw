@@ -10,7 +10,18 @@ Ext.application({
     {           
         var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550);
         var thisCanvas = whiteboard.getCanvas();
-        //whiteboard.drawCircle();
+        //whiteboard.drawCircle();        
+                
+        
+           
+        
+        Ext.Viewport.on({
+            delegate: 'button',
+            tap: function(button) {
+                //overlay.setMessage("This is a message");
+                //overlay.show();
+            }
+        });
         
         Ext.create('Ext.Panel', {
             fullscreen : true,
@@ -94,7 +105,32 @@ Ext.application({
                             whiteboard.setPen('#000000');
                         }
                     }
-                }],
+                },
+                {
+                    xtype: 'button',
+                    text: 'More',
+                    ui: 'action',
+                    cls: 'action-button',
+                    width: '20%',
+                    listeners:{
+                        tap: function(){
+                            
+                        }
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Chat',
+                    ui: 'action',
+                    cls: 'action-button',
+                    width: '30%',
+                    listeners:{
+                        tap: function(){
+                            
+                        }
+                    }
+                },
+                ],
             }, ]
         });
     }
