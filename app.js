@@ -13,15 +13,7 @@ Ext.application({
         //whiteboard.drawCircle();        
                 
         
-           
         
-        Ext.Viewport.on({
-            delegate: 'button',
-            tap: function(button) {
-                //overlay.setMessage("This is a message");
-                //overlay.show();
-            }
-        });
         
         Ext.create('Ext.Panel', {
             fullscreen : true,
@@ -108,13 +100,28 @@ Ext.application({
                 },
                 {
                     xtype: 'button',
-                    text: 'More',
+                    text: 'More Options',
                     ui: 'action',
                     cls: 'action-button',
                     width: '20%',
                     listeners:{
                         tap: function(){
-                            
+                            var moreOptionsOverlay = Ext.create('Ext.Panel', {
+                                floating        : true,
+                                modal           : true,
+                                hidden          : true,
+                                height          : 300,
+                                width           : '50%',
+                                contentEl       : 'content',
+                                styleHtmlContent: true,
+                                scrollable      : true,
+                                items: [{
+                                        docked: 'top',
+                                        xtype : 'toolbar',
+                                        title : 'Overlay Title'
+                                }]
+                            });
+                            moreOptionsOverlay.showBy(button);
                         }
                     }
                 },

@@ -1,5 +1,7 @@
 Ext.require('Whiteboard.MessageEvent');
 
+var nodejsAddress = 'http://128.83.74.33:4001';
+
 Ext.define('Whiteboard.Canvas',{
     cvs : 'undefined',
     cx : 'undefined',
@@ -19,7 +21,7 @@ Ext.define('Whiteboard.Canvas',{
         this.cx.lineCap = "round";
         this.cx.fillStyle = "#FFFF00";
         
-        this.connection = Ext.create('Whiteboard.Connection', 'http://128.83.74.33:4001', this);
+        this.connection = Ext.create('Whiteboard.Connection', nodejsAddress, this);
         this.connection.init("test", "one");
     },
     

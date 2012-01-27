@@ -132,6 +132,7 @@ Ext.define('Whiteboard.Connection',{
     
     remoteMadeVideo: function(self, data){
         // Show dialog box to say the video is done, and show download link for video
+        this.messageEvent.fireEvent('showMessage', "Video ready. Open the \"More Options\" menu to view and download the video");
     },
     
     remoteSavedCanvas: function(self, data){
