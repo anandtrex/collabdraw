@@ -25,6 +25,9 @@
                 data = singlePath[d];
                 //console.log("Datas: "+JSON.stringify(datas));
                 // console.log("Length of data:"+datas.length);
+                if(!roomDatas[socket.room]){
+                    roomDatas[socket.room] = [];
+                }
                 roomDatas[socket.room].push(data);
             //i++;
             }

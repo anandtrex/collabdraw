@@ -64,6 +64,7 @@ Ext.define('Whiteboard.Connection',{
     },
     
     sendPath : function (data){
+        console.log("Sending path!");
         this.singlePath.push(data);
         this.currentPathLength ++;
         if(this.currentPathLength > 2 || data.type === "touchend"){
@@ -82,6 +83,7 @@ Ext.define('Whiteboard.Connection',{
     },
     
     init: function(uid, roomName){
+        console.log("Initializing!");
         this.uid = uid;
         this.roomName = roomName;
         

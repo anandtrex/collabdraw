@@ -10,11 +10,7 @@ Ext.application({
     {           
         var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550);
         var thisCanvas = whiteboard.getCanvas();
-        //whiteboard.drawCircle();        
                 
-        
-        
-        
         Ext.create('Ext.Panel', {
             fullscreen : true,
             layout : 'vbox',
