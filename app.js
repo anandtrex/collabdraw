@@ -3,15 +3,19 @@ Ext.Loader.setPath('Whiteboard','./js');
 Ext.require('Whiteboard.Canvas');
 Ext.require('Whiteboard.Connection');
 
+var uid = "test";
+var room = "one";
+
 Ext.application({
-    name : 'canvas',
+    name : 'collabdraw',
 
     launch : function()
     {           
-        var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550);
+        var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550, uid, room);
         var thisCanvas = whiteboard.getCanvas();
                 
-        Ext.create('Ext.Panel', {
+        Ext.Viewport.add({
+            xtype: 'panel',
             fullscreen : true,
             layout : 'vbox',
             //centered: true,
@@ -26,20 +30,32 @@ Ext.application({
                     centered: 'true',
                     style: 'background-color: #ffffff;',
                     html: thisCanvas,
-                    initialize: function(){
-                        //console.log(this.xtype);
-                        this.element.on({
-                            touchstart: function(event){
-                                //console.log(this.getX());
-                                whiteboard.startPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
-                            },
-                            touchmove: function(event){
-                                whiteboard.continuePath(event.pageX - this.getX(), event.pageY - this.getY(), true);
-                            },
-                            touchend: function(event){
-                                whiteboard.endPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
-                            }
-                        })
+                    listeners: {
+                        initialize: function(){
+                            console.log("panel initialized");
+                            this.element.on({
+                                touchstart: function(event){
+                                    //console.log(this.getX());
+                                    whiteboard.startPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
+                                },
+                                touchmove: function(event){
+                                    //console.log(event.type);
+                                    //console.log(this.getX());
+                                    whiteboard.continuePath(event.pageX - this.getX(), event.pageY - this.getY(), true);
+                                },
+                                touchend: function(event){
+                                    //console.log(this.getX());
+                                    whiteboard.endPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
+                                },
+                                /*
+                                tap: function(event){
+                                    console.log(event.type);
+                                },
+                                mousedown: function(event){
+                                    console.log(event.type);
+                                },*/
+                            })
+                        }
                     }
                 }],
             },
@@ -107,17 +123,66 @@ Ext.application({
                                 modal           : true,
                                 hidden          : true,
                                 height          : 300,
-                                width           : '50%',
+                                width           : 250,
                                 contentEl       : 'content',
                                 styleHtmlContent: true,
                                 scrollable      : true,
-                                items: [{
+                                hideOnMaskTap: true,
+                                items: [
+                                    {
                                         docked: 'top',
                                         xtype : 'toolbar',
-                                        title : 'Overlay Title'
-                                }]
+                                        title : 'More Options'
+                                    },
+                                    {
+                                      xtype: 'button',
+                                      text: 'Create/Join Room',
+                                      cls: 'action-button',
+                                      height: 30,
+                                      listeners: {
+                                          tap: function() {
+                                              Ext.Msg.show({
+                                               title: 'Enter Room name.',
+                                               message: 'If the room doesn\'t exist already in your account, it will be created.',
+                                               width: 300,
+                                               buttons: Ext.MessageBox.OKCANCEL,
+                                               multiLine: false,
+                                               prompt : { maxlength : 180, autocapitalize : false },
+                                               fn: function(buttonId, value) {
+                                                   if(buttonId == "ok"){
+                                                       //console.log("Room name was "+value);
+                                                       whiteboard.joinRoom(value);
+                                                   }
+                                               }
+                                            });
+                                          }
+                                      }
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        text: 'Get Video',
+                                        cls: 'action-button',
+                                        height: 30,
+                                        listeners: {
+                                            tap: function() {
+                                                whiteboard.makeVideo();
+                                            }
+                                        }
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        text: 'Snapshot',
+                                        cls: 'action-button',
+                                        height: 30,
+                                        listeners: {
+                                            tap: function() {
+                                                window.open(whiteboard.getPngUrl(), "Snapshot");
+                                            }
+                                        }
+                                    }
+                                ]
                             });
-                            moreOptionsOverlay.showBy(button);
+                            moreOptionsOverlay.showBy(this);
                         }
                     }
                 },

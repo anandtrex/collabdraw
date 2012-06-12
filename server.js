@@ -225,7 +225,7 @@
             }
             console.log("Deleting files");
             // NOTE This is async. Beware!
-            exec("./deleteFiles.sh", doVideo);
+            exec("./delete_files.sh", doVideo);
             video = false;
         });
         /**

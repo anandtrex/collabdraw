@@ -36,35 +36,33 @@ Ext.define('Whiteboard.Connection',{
         this.messageEvent = Ext.create('Whiteboard.MessageEvent', {
             listeners: {
                 showMessage: function(message){
-                    var overlay = Ext.create('Ext.Panel', {
-                        //floating        : false,
-                        //modal           : false,
-                        hidden          : true,
-                        height          : 30,
-                        width           : '50%',
-                        contentEl       : 'content',
-                        styleHtmlContent: true,
-                        scrollable      : false,
-                        style: 'background-color: #FFFFCC; text-align: center;',
-                        docked: "top",
-                        listeners: {
-                            show: function () {
-                                setTimeout(function(){overlay.hide()}, 3000);    
-                            },
-                        },
-                        setMessage: function(message){
-                            this.setHtml("<p>"+message+"</p>");
-                        }
-                    });
-                    overlay.setMessage(message);
-                    overlay.show();
+                    
+                    var msgOverlay = Ext.create('Ext.Panel', {
+                                //floating        : true,
+                                hidden          : true,
+                                height          : 30,
+                                width           : '20%',
+                                scrollable      : false,
+                                //hideOnMaskTap: true,
+                                border: 'none',
+                                margin: '0',
+                                docked: 'top',
+                                //top: '5px',
+                                left: '40%',
+                                html: '',
+                            });
+                    // Required for being able to show the overlay
+                    Ext.Viewport.add(msgOverlay);
+                    msgOverlay.setHtml("<div>"+message+"</div>");
+                    msgOverlay.show();
+                    setTimeout(function(){msgOverlay.hide()}, 3000);   
                 }
             }
         });
     },
     
     sendPath : function (data){
-        console.log("Sending path!");
+        //console.log("Sending path!");
         this.singlePath.push(data);
         this.currentPathLength ++;
         if(this.currentPathLength > 2 || data.type === "touchend"){
@@ -82,8 +80,14 @@ Ext.define('Whiteboard.Connection',{
         });
     },
     
+    makeVideo: function(){
+        this.socket.emit('video', {
+            uid : this.uid,
+        });
+    },
+    
     init: function(uid, roomName){
-        console.log("Initializing!");
+        //console.log("Initializing...");
         this.uid = uid;
         this.roomName = roomName;
         
@@ -111,9 +115,6 @@ Ext.define('Whiteboard.Connection',{
     },
     
     remoteDrawMany: function(self, data){
-        //console.log('function remoteDrawMany');
-        //console.log('data length is '+data.length);
-        //console.log(data);
         self.whiteboard.clear();
         ds = data.datas;
         for(d in ds){
@@ -134,7 +135,8 @@ Ext.define('Whiteboard.Connection',{
     
     remoteMadeVideo: function(self, data){
         // Show dialog box to say the video is done, and show download link for video
-        this.messageEvent.fireEvent('showMessage', "Video ready. Open the \"More Options\" menu to view and download the video");
+        this.messageEvent.fireEvent('showMessage', "Video ready");
+        window.open("http://128.83.74.33:8888/collabdraw/test/test.mp4", "Download");
     },
     
     remoteSavedCanvas: function(self, data){
@@ -147,5 +149,5 @@ Ext.define('Whiteboard.Connection',{
             uid: this.uid,
             canvasName: this.roomName,
         });
-    }
+    },
 });

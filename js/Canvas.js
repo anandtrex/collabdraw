@@ -1,6 +1,6 @@
 Ext.require('Whiteboard.MessageEvent');
 
-var nodejsAddress = 'http://169.254.135.110:4001';
+var nodejsAddress = 'http://128.83.74.33:4001';
 
 Ext.define('Whiteboard.Canvas',{
     /**
@@ -11,9 +11,12 @@ Ext.define('Whiteboard.Canvas',{
      * 2D context from canvas
      */
     cx : 'undefined',
+    /**
+     * Connection to server
+     */
     connection: 'undefined',
     
-    constructor: function(width, height){
+    constructor: function(width, height, uid, room){
         
         this.cvs = document.createElement("canvas");
         this.cvs.height = height;
@@ -28,7 +31,15 @@ Ext.define('Whiteboard.Canvas',{
         this.cx.fillStyle = "#FFFF00";
         
         this.connection = Ext.create('Whiteboard.Connection', nodejsAddress, this);
-        this.connection.init("test", "one");
+        this.connection.init(uid, room);
+    },
+    
+    joinRoom: function(room){
+        this.connection.init(this.connection.uid, room);
+    },
+    
+    makeVideo: function(){
+        this.connection.makeVideo();
     },
     
     getCanvas: function(){
@@ -108,5 +119,9 @@ Ext.define('Whiteboard.Canvas',{
     
     save: function(){
         this.connection.save();
+    },
+    
+    getPngUrl: function(){
+        return this.cvs.toDataURL("image/png");
     }
 });
