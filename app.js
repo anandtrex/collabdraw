@@ -1,6 +1,7 @@
 Ext.Loader.setConfig({enabled:true});
 Ext.Loader.setPath('Whiteboard','./js');
 Ext.require('Whiteboard.Canvas');
+Ext.require('Whiteboard.Svg');
 Ext.require('Whiteboard.Connection');
 
 var uid = "test";
@@ -11,8 +12,9 @@ Ext.application({
 
     launch : function()
     {           
-        var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550, uid, room);
-        var thisCanvas = whiteboard.getCanvas();
+        //var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550, uid, room);
+        //var thisCanvas = whiteboard.getCanvas();
+        var whiteboard;
                 
         Ext.Viewport.add({
             xtype: 'panel',
@@ -29,33 +31,27 @@ Ext.application({
                     xtype: 'panel',
                     centered: 'true',
                     style: 'background-color: #ffffff;',
-                    html: thisCanvas,
+                    //id: 'whiteboard-container',
+                    //html: thisCanvas,
+                    html: "<div id='whiteboard-container'></div>",
                     listeners: {
                         initialize: function(){
                             console.log("panel initialized");
                             this.element.on({
                                 touchstart: function(event){
-                                    //console.log(this.getX());
                                     whiteboard.startPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
                                 },
                                 touchmove: function(event){
-                                    //console.log(event.type);
-                                    //console.log(this.getX());
                                     whiteboard.continuePath(event.pageX - this.getX(), event.pageY - this.getY(), true);
                                 },
                                 touchend: function(event){
-                                    //console.log(this.getX());
                                     whiteboard.endPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
                                 },
-                                /*
-                                tap: function(event){
-                                    console.log(event.type);
-                                },
-                                mousedown: function(event){
-                                    console.log(event.type);
-                                },*/
                             })
-                        }
+                        },
+                        painted: function(){
+                            whiteboard = Ext.create('Whiteboard.Svg', 1000, 550, uid, room);
+                        },
                     }
                 }],
             },
@@ -63,7 +59,6 @@ Ext.application({
                 xtype : 'panel',
                 layout: 'hbox',
                 style: 'background-color: #5E99CC; padding: 4px',
-                //html : 'This is docked to the bottom',
                 flex: 0,
                 items: [
                 {
@@ -179,7 +174,18 @@ Ext.application({
                                                 window.open(whiteboard.getPngUrl(), "Snapshot");
                                             }
                                         }
-                                    }
+                                    }, 
+                                    {
+                                        xtype: 'button',
+                                        text: 'Upload',
+                                        cls: 'action-button',
+                                        height: 30,
+                                        listeners: {
+                                            tap: function() {
+                                                window.open('http://128.83.74.33:8888/collabdraw/upload.php', "Snapshot");
+                                            }
+                                        }
+                                    }                                   
                                 ]
                             });
                             moreOptionsOverlay.showBy(this);

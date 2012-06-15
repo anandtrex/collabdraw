@@ -12,33 +12,65 @@
 
     io.sockets.on('connection', function(socket)
     {
+        socket.room = "one";
+        
         var mongodb = require('mongodb');
         var server = new mongodb.Server("127.0.0.1", 27017, {});
         var db_connector = new mongodb.Db("coll_canv", server, {});
+
+        var dl = require('delivery');
+        var fs = require('fs');
+        var delivery = dl.listen(socket);
+
+        delivery.on('receive.success', function(file)
+        {
+            try {
+                // Query the entry
+                stats = fs.lstatSync("files/"+socket.room);
+
+                // Is it a directory?
+                if (stats.isDirectory()) {
+                    // Yes it is
+                    // So do nothing
+                }
+            } catch (e) {
+                // Create the directory
+                fs.mkdirSync("files/"+socket.room);
+            }
+
+            fs.writeFile("files/"+socket.room + "/" + file.name, file.buffer, function(err)
+            {
+                if (err) {
+                    console.log('File could not be saved.');
+                } else {
+                    console.log('File saved.');
+                };
+            });
+        });
 
         socket.on('drawClick', function(input)
         {
             console.log("Receiving path");
             var singlePath = input.singlePath;
             var data = {};
-            for (d in singlePath){
+            for (d in singlePath) {
                 data = singlePath[d];
                 //console.log("Datas: "+JSON.stringify(datas));
                 // console.log("Length of data:"+datas.length);
-                if(!roomDatas[socket.room]){
+                if (!roomDatas[socket.room]) {
                     roomDatas[socket.room] = [];
                 }
                 roomDatas[socket.room].push(data);
-            //i++;
+                //i++;
             }
             socket.broadcast.to(socket.room).emit('draw', {
                 singlePath : singlePath,
                 /*
-                    x : data.x,
-                    y : data.y,
-                    type : data.type,
-                    lineColor : data.lineColor,
-                    lineWidth : data.lineWidth,*/
+                 x : data.x,
+                 y : data.y,
+                 type : data.type,
+                 lineColor : data.lineColor,
+                 lineWidth : data.lineWidth,*/
             });
         });
 
@@ -47,7 +79,7 @@
             console.log("Initializing");
             //console.log("data: " + JSON.stringify(data));
             // TODO compress datas before emitting
-            if(socket.room) {
+            if (socket.room) {
                 console.log("Leaving room " + socket.room);
                 socket.leave(socket.room);
             }
@@ -55,7 +87,7 @@
             socket.join(data.roomName);
             socket.room = data.roomName;
             //roomDatas[socket.room] = [];
-            if(!roomDatas[socket.room]) {
+            if (!roomDatas[socket.room]) {
                 roomDatas[socket.room] = [];
                 // console.log("data: " + JSON.stringify(data));
                 console.log("Getting data from db");
@@ -64,7 +96,7 @@
                 // data.roomName);
                 db_connector.open(function(error, client)
                 {
-                    if(error)
+                    if (error)
                         throw error;
                     var collection = new mongodb.Collection(client, data.uid);
                     canvasName = data.roomName;
@@ -73,18 +105,18 @@
                         canvasName : data.roomName
                     }).toArray(function(err, results)
                     {
-                        if(err)
+                        if (err)
                             throw err;
                         //console.log("These are the results: " + JSON.stringify(results));
                         //console.log("Length of results: "+results.length);
-                        if(results.length == 0) {
+                        if (results.length == 0) {
                             //console.log("Empty init");
                             roomDatas[socket.room] = [];
                         } else {
                             roomDatas[socket.room] = results[results.length - 1].datas;
                         }
-                        
-                        while(roomDatas[socket.room].length > 1 && roomDatas[socket.room][0] == null) {
+
+                        while (roomDatas[socket.room].length > 1 && roomDatas[socket.room][0] == null) {
                             roomDatas[socket.room].shift();
                             console.log("Discarding top of roomDatas");
                         }
@@ -113,18 +145,16 @@
 
         socket.on('video', function(uid)
         {
-            if(video == true){
+            if (video == true) {
                 socket.emit('message', {
-                    message: "This is not available at this time. Please try again later."
+                    message : "This is not available at this time. Please try again later."
                 })
                 return;
-            }
-            else {
+            } else {
                 video = true;
             }
             console.log("Saving png");
             var Canvas = require('canvas'), canvas = new Canvas(920, 550);
-            var fs = require('fs');
             var sys = require('sys');
             var exec = require('child_process').exec;
             function doVideo(error, stdout, stderr)
@@ -140,10 +170,10 @@
                     ctx = canvas.getContext('2d');
                     ctx.strokeStyle = lineColor;
                     ctx.lineWidth = lineWidth;
-                    if(type === "dragstart" || type === "touchstart") {
+                    if (type === "dragstart" || type === "touchstart") {
                         ctx.beginPath();
                         ctx.moveTo(x, y);
-                    } else if(type === "drag" || type === "touchmove") {
+                    } else if (type === "drag" || type === "touchmove") {
                         ctx.lineTo(x, y);
                         ctx.stroke();
                     } else {
@@ -171,8 +201,8 @@
                     writtenNo = i;
                     //console.log(i);
                 }
-                for(var d = 0; d < roomDatas[socket.room].length; d++) {
-                    if(roomDatas[socket.room][d] == null || roomDatas[socket.room][d] == undefined || roomDatas[socket.room][d] == "undefined") {
+                for (var d = 0; d < roomDatas[socket.room].length; d++) {
+                    if (roomDatas[socket.room][d] == null || roomDatas[socket.room][d] == undefined || roomDatas[socket.room][d] == "undefined") {
                         console.log("null or undefined data in roomDatas[socket.room][d] for d = " + d + "!");
                         continue;
                     }
@@ -197,7 +227,7 @@
                 var doneWriting = false;
                 var t = setInterval(function()
                 {
-                    if(writtenNo != oldWrittenNo) {
+                    if (writtenNo != oldWrittenNo) {
                         oldWrittenNo = writtenNo;
                     } else {
                         console.log("Done!");
@@ -223,6 +253,8 @@
                 }
 
             }
+
+
             console.log("Deleting files");
             // NOTE This is async. Beware!
             exec("./delete_files.sh", doVideo);
@@ -236,7 +268,7 @@
             console.log("Saving canvas");
             db_connector.open(function(error, client)
             {
-                if(error)
+                if (error)
                     throw error;
                 var uid = data.uid;
                 var collection = new mongodb.Collection(client, uid);
@@ -266,7 +298,7 @@
             var uid = data.uid;
             db_connector.open(function(error, client)
             {
-                if(error)
+                if (error)
                     throw error;
                 var collection = new mongoDb.Collection(client, uid);
                 var cursor = collection.find({}, {
@@ -275,7 +307,7 @@
                 var canvasList = [];
                 cursor.each(function(err, doc)
                 {
-                    if(err)
+                    if (err)
                         console.log("Error cursor: " + err);
                     console.log("doc: " + JSON.stringify(doc));
                 });
