@@ -6,6 +6,7 @@
      */
     var io = require('socket.io').listen(4001);
     var video = false;
+    var db = 'undefined';
 
     //var i = 0;
     var roomDatas = [];
@@ -127,7 +128,9 @@
                     });
                     console.log("Done retrieving!");
                     //client.close();
+                    db = client;
                 });
+                
             } else {
                 socket.emit('draw-many', {
                     datas : roomDatas[socket.room],
@@ -266,12 +269,12 @@
         socket.on('save-canvas', function(data)
         {
             console.log("Saving canvas");
-            db_connector.open(function(error, client)
-            {
-                if (error)
-                    throw error;
+            //db_connector.open(function(error, client)
+            //{
+                //if (error)
+                //    throw error;
                 var uid = data.uid;
-                var collection = new mongodb.Collection(client, uid);
+                var collection = new mongodb.Collection(db, uid);
                 canvasName = data.canvasName;
                 console.log("canvas name", canvasName);
                 console.log("Removing old saves");
@@ -290,7 +293,7 @@
                     uid : uid,
                 });
                 //client.close();
-            });
+            //});
         });
 
         socket.on('getCanvasList', function(data)

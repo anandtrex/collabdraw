@@ -1,6 +1,6 @@
 Ext.require('Whiteboard.MessageEvent');
 
-var nodejsAddress = 'http://128.83.74.33:4001';
+var nodejsAddress = 'http://'+localUrl+':4001';
 
 Ext.define('Whiteboard.Canvas',{
     /**

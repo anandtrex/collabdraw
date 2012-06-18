@@ -7,6 +7,8 @@ ______________
 5. Install ffmpeg to enable conversion to video feature
 6. "npm install canvas" to enable conversion to video feature
     This might require installation of various dev libraries including jpeg, png and gif libraries, cairo, and the standard build tools (gcc). The libraries that are missing will be shown in error messages while trying to install this.
+7. "npm install delivery" to install the library for enabling uploads
+8. Download Sencha Touch libraries (from http://www.sencha.com/products/touch/download/). Untar and rename the folder to "touch" and copy it into the root directory
     
     
 RUNNING:
@@ -15,6 +17,12 @@ RUNNING:
 2. Run the nodejs server using "node server.js"
     Where server.js is in the root directory of the project
 3. Put the entire project in the htdocs/public_html folder of any server that can serve php (apache, nginx, etc.)
-4. Replace "http://128.83.74.33:4001" in both index3.php and js/Canvas.js to the IP and port of the server running nodejs.
-    (index3.php contains the UI rewritten in Sencha Touch. index.php contains the older UI that uses jQuery. The nodejs server address needs to be replaced in this too if you intend to use it.)
-5. Open "http://apache-server-address:port/canvas-draw-dev/index3.php" in Safari on iPad or Safari on Mac OS X / Windows. (This is the site that uses the Sencha touch UI. Open index.php to see the older UI that doesn't work as well, but has all the features)
+4. Replace the server address in the indicated locations in both index.php and upload.php to the IP and port of the server running nodejs.
+5. Open "http://apache-server-address:port/canvas-draw/index.php" in Safari on iPad or Safari on Mac OS X / Windows.
+
+
+KNOWN-ISSUES:
+---------------
+1. Doesn't work very well on android browsers (except Chrome on ICS) due to limited html5 support
+2. Upload and Save as Video functionality not fully integrated yet
+3. Login not enabled by default

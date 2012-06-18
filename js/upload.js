@@ -14,7 +14,7 @@ function fileSelected()
 
 function uploadFile()
 {
-    var socket = io.connect('http://128.83.74.33:4001');
+    var socket = io.connect('http://'+localUrl+':4001');
 
     socket.on('connect', function()
     {
@@ -30,7 +30,6 @@ function uploadFile()
             console.log("file was successfully sent.");
             var uploadResponse = document.getElementById('uploadResponse');
             uploadResponse.innerHTML = "File successfully sent";
-            //console.log(fileUID);
             uploadResponse.style.display = 'block';
         });
     });

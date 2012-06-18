@@ -1,6 +1,6 @@
 Ext.require('Whiteboard.MessageEvent');
 
-var nodejsAddress = 'http://128.83.74.33:4001';
+var nodejsAddress = 'http://'+localUrl+':4001';
 
 Ext.define('Whiteboard.Svg',{
     cvs: 'undefined',
@@ -36,15 +36,6 @@ Ext.define('Whiteboard.Svg',{
     
     getCanvas: function(){
       return this.cvs;  
-    },
-    
-    drawCircle: function(){
-        /*
-        this.cx.beginPath();
-        this.cx.arc(75, 75, 10, 0, Math.PI*2, true); 
-        this.cx.closePath();
-        this.cx.fill();
-        */
     },
     
     startPath: function(x, y, send){
@@ -114,7 +105,7 @@ Ext.define('Whiteboard.Svg',{
     },
     
     getPngUrl: function(){
-        //return this.cvs.toDataURL("image/png");
+        return this.cvs.toDataURL("image/png");
     },
     
     loadImage: function(url){

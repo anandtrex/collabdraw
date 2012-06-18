@@ -156,7 +156,7 @@ Ext.define('Whiteboard.Connection', {
     {
         // Show dialog box to say the video is done, and show download link for video
         this.messageEvent.fireEvent('showMessage', "Video ready");
-        window.open("http://128.83.74.33:8888/collabdraw/test/test.mp4", "Download");
+        window.open("http://"+localUrl+"/collabdraw/test/test.mp4", "Download");
     },
 
     remoteSavedCanvas : function(self, data)

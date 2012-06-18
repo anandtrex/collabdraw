@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Files using XMLHttpRequest</title>
+    <title>Upload Files</title>
     <link rel="stylesheet" href="css/upload.css" type="text/css">
     <script type="text/javascript" src="js/upload.js"></script>
     <script type="text/javascript" src="js/delivery.js"></script>
+    <!-- Replace localUrl with the nodejs server address -->
+    <script>
+    var localUrl = "192.168.1.5";
+    </script>
+    
+    <!-- Replace this with the address of the node.js server -->
     <script src="http://128.83.74.33:4001/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -27,18 +33,6 @@
   </div>
   <div class="row"></div>
   <div id="progressIndicator">
-    <!--
-    <div id="progressBar" class="floatLeft">
-    </div>
-    <div id="progressNumber" class="floatRight">&nbsp;</div>
-    <div class="clear"></div>
-    <div>
-      <div id="transferSpeedInfo" class="floatLeft" style="width: 80px;">&nbsp;</div>
-      <div id="timeRemainingInfo" class="floatLeft" style="margin-left: 10px;">&nbsp;</div>
-      <div id="transferBytesInfo" class="floatRight" style="text-align: right;">&nbsp;</div>
-      <div class="clear"></div>
-    </div>    
-    -->
     <div id="uploadResponse"></div>
   </div>  
 </form>

@@ -1,6 +1,6 @@
 Ext.Loader.setConfig({enabled:true});
 Ext.Loader.setPath('Whiteboard','./js');
-Ext.require('Whiteboard.Canvas');
+//Ext.require('Whiteboard.Canvas');
 Ext.require('Whiteboard.Svg');
 Ext.require('Whiteboard.Connection');
 
@@ -182,7 +182,7 @@ Ext.application({
                                         height: 30,
                                         listeners: {
                                             tap: function() {
-                                                window.open('http://128.83.74.33:8888/collabdraw/upload.php', "Snapshot");
+                                                window.open('http://'+localUrl+'/collabdraw/upload.php', "Snapshot");
                                             }
                                         }
                                     }                                   
