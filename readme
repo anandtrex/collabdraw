@@ -17,8 +17,7 @@ RUNNING:
 2. Run the nodejs server using "node server.js"
     Where server.js is in the root directory of the project
 3. Put the entire project in the htdocs/public_html folder of any server that can serve php (apache, nginx, etc.)
-4. Replace the server address in the indicated locations in both index.php and upload.php to the IP and port of the server running nodejs.
-5. Open "http://apache-server-address:port/canvas-draw/index.php" in Safari on iPad or Safari on Mac OS X / Windows.
+4. Open "http://apache-server-address:port/canvas-draw/index.php" in Safari on iPad or Safari on Mac OS X / Windows.
 
 
 KNOWN-ISSUES:

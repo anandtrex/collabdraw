@@ -7,11 +7,12 @@
     <script type="text/javascript" src="js/delivery.js"></script>
     <!-- Replace localUrl with the nodejs server address -->
     <script>
-    var localUrl = "192.168.1.5";
+    var localUrl = "<?php echo $local_ip ?>";
+    var nodejsPort = <?php echo $nodejs_port ?>;
     </script>
     
     <!-- Replace this with the address of the node.js server -->
-    <script src="http://128.83.74.33:4001/socket.io/socket.io.js"></script>
+    <script src="http://<?php echo $local_ip.":".$nodejs_port ?>/socket.io/socket.io.js"></script>
 </head>
 <body>
 <form id="form1" enctype="multipart/form-data" method="post" action="upload_file.php">

@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<?php 
+require_once('config.php');
+?>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
@@ -9,11 +12,12 @@
     
     <!-- Replace localUrl with the nodejs server address -->
     <script>
-    var localUrl = "192.168.1.5";
+    var localUrl = "<?php echo $local_ip ?>";
+    var nodejsPort = <?php echo $nodejs_port ?>;
     </script>
     
     <!-- Replace with the nodejs server address -->
-    <script src="http://192.168.1.5:4001/socket.io/socket.io.js"></script>
+    <script src="http://<?php echo $local_ip.":".$nodejs_port ?>/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="js/raphael-min.js"></script>
     <script type="text/javascript" src="js/upload.js"></script>
     <script type="text/javascript" src="js/delivery.js"></script>    

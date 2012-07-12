@@ -14,7 +14,7 @@ function fileSelected()
 
 function uploadFile()
 {
-    var socket = io.connect('http://'+localUrl+':4001');
+    var socket = io.connect('http://'+localUrl+':'+nodejsPort);
 
     socket.on('connect', function()
     {

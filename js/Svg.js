@@ -1,6 +1,6 @@
 Ext.require('Whiteboard.MessageEvent');
 
-var nodejsAddress = 'http://'+localUrl+':4001';
+var nodejsAddress = 'http://'+localUrl+':'+nodejsPort;
 
 Ext.define('Whiteboard.Svg',{
     cvs: 'undefined',
