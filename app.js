@@ -12,8 +12,6 @@ Ext.application({
 
     launch : function()
     {           
-        //var whiteboard = Ext.create('Whiteboard.Canvas', 1000, 550, uid, room);
-        //var thisCanvas = whiteboard.getCanvas();
         var whiteboard;
                 
         Ext.Viewport.add({
@@ -33,10 +31,9 @@ Ext.application({
                     style: 'background-color: #ffffff;',
                     //id: 'whiteboard-container',
                     //html: thisCanvas,
-                    html: "<div id='whiteboard-container'></div>",
+                    html: "<div id='whiteboard-container-0' class='whiteboard-container'></div>",
                     listeners: {
                         initialize: function(){
-                            console.log("panel initialized");
                             this.element.on({
                                 touchstart: function(event){
                                     whiteboard.startPath(event.pageX - this.getX(), event.pageY - this.getY(), true);
@@ -171,7 +168,9 @@ Ext.application({
                                         height: 30,
                                         listeners: {
                                             tap: function() {
-                                                window.open(whiteboard.getPngUrl(), "Snapshot");
+                                                var svg = document.getElementsByTagName('svg')[0];
+                                                var svg_xml = (new XMLSerializer).serializeToString(svg);
+                                                window.open("data:image/svg+xml;base64,"+btoa(svg_xml), "Snapshot");
                                             }
                                         }
                                     }, 
@@ -182,7 +181,27 @@ Ext.application({
                                         height: 30,
                                         listeners: {
                                             tap: function() {
-                                                window.open('http://'+localUrl+'/collabdraw/upload.php', "Snapshot");
+                                                window.open('http://'+localUrl+':'+httpPort+'/collabdraw/upload.php', "Upload");
+                                            }
+                                        }
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        text: 'Load first image',
+                                        cls: 'action-button',
+                                        height: 30,
+                                        listeners: {
+                                            tap: function() {
+                                                /*
+                                                var img = document.createElement('img');
+                                                //var img2 = new Image();
+                                                //img2.src='http://localhost:8888/collabdraw/files/one/Neuron_Hand_tuned.png';
+                                                //console.log(img2.height);
+                                                img.src='http://localhost:8888/collabdraw/files/one/Neuron_Hand_tuned.png';
+                                                console.log(img.width+" "+img.height);
+                                                whiteboard.loadImage("http://localhost:8888/collabdraw/files/one/Neuron_Hand_tuned.png", img.width, img.height);
+                                                */
+                                               whiteboard.getImage();
                                             }
                                         }
                                     }                                   
@@ -201,6 +220,28 @@ Ext.application({
                     listeners:{
                         tap: function(){
                             
+                        }
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Previous',
+                    ui: 'action',
+                    cls: 'action-button',
+                    listeners:{
+                        tap: function(){
+                            whiteboard.prevPage();
+                        }
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Next',
+                    ui: 'action',
+                    cls: 'action-button',
+                    listeners:{
+                        tap: function(){
+                            whiteboard.nextPage();
                         }
                     }
                 },

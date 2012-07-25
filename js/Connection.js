@@ -11,34 +11,42 @@ Ext.define('Whiteboard.Connection', {
     {
         this.whiteboard = whiteboard;
         this.socket = io.connect(address);
-        //this.whiteboard.clear();
-        //console.log(this.whiteboard);
 
         spr = this;
 
         this.socket.on('draw', function(data)
         {
-            spr.remoteDraw(spr, data);
+            if(spr.whiteboard.currentPage == data.page)
+                spr.remoteDraw(spr, data);
         });
         this.socket.on('draw-many', function(data)
         {
-            //console.log('draw-many event seen');
-            //console.log('data is '+data);
-            spr.remoteDrawMany(spr, data);
+            if(spr.whiteboard.currentPage == data.page)
+                spr.remoteDrawMany(spr, data);
         });
         this.socket.on('clear', function(data)
-        {
-            spr.remoteClear(spr, data);
+        {   
+            if(spr.whiteboard.currentPage == data.page)
+                spr.remoteClear(spr, data);
         });
         this.socket.on('made-video', function(data)
         {
-            spr.remoteMadeVideo(spr, data);
+            if(spr.whiteboard.currentPage == data.page)
+                spr.remoteMadeVideo(spr, data);
         });
         this.socket.on('saved-canvas', function(data)
         {
-            spr.remoteSavedCanvas(spr, data);
+            if(spr.whiteboard.currentPage == data.page)
+                spr.remoteSavedCanvas(spr, data);
         });
-
+        this.socket.on('image', function(data){
+            if(spr.whiteboard.currentPage == data.page)
+                spr.remoteImage(spr, data);
+        });
+        
+        /**
+         * Message event popup UI
+         */
         this.messageEvent = Ext.create('Whiteboard.MessageEvent', {
             listeners : {
                 showMessage : function(message)
@@ -71,11 +79,15 @@ Ext.define('Whiteboard.Connection', {
         });
     },
 
+    /**
+     * Send a single path (segment) to the server
+     * @param {x, y, type, lineColor, lineWidth} a point on the path
+     */
     sendPath : function(data)
     {
-        //console.log("Sending path!");
         this.singlePath.push(data);
         this.currentPathLength++;
+        // Send path every two points or when user removes finger
         if (this.currentPathLength > 2 || data.type === "touchend") {
             this.socket.emit('drawClick', {
                 singlePath : this.singlePath,
@@ -85,6 +97,9 @@ Ext.define('Whiteboard.Connection', {
         }
     },
 
+    /**
+     * Clear all other canvases (in the same room on the same page)
+     */
     sendClear : function()
     {
         this.socket.emit('clear', {
@@ -92,6 +107,9 @@ Ext.define('Whiteboard.Connection', {
         });
     },
 
+    /**
+     * Make video remotely
+     */
     makeVideo : function()
     {
         this.socket.emit('video', {
@@ -99,23 +117,37 @@ Ext.define('Whiteboard.Connection', {
         });
     },
 
-    init : function(uid, roomName)
+    /**
+     * Get data from server to initialize this whiteboard
+     * @param {Object} uid
+     * @param {Object} roomName
+     * @param {Object} page
+     */
+    init : function(uid, roomName, page)
     {
-        //console.log("Initializing...");
+        this.whiteboard.clear();
         this.uid = uid;
         this.roomName = roomName;
+        
+        this.getImage(page);
 
         this.socket.emit('init', {
             uid : uid,
             roomName : roomName,
+            page: page,
         });
     },
 
+    /**
+     * Draw from realtime data incoming from server
+     * Called when server sends @event 'draw'
+     * @param {Object} self
+     * @param {singlePath: [points...]} input
+     */
     remoteDraw : function(self, input)
     {
-        //self.whiteboard.setPen("black");
         var sPath = input.singlePath;
-        var data = {};
+        var data = {}; // point on path
         for (d in sPath) {
             data = sPath[d];
             if (data == null)
@@ -130,9 +162,15 @@ Ext.define('Whiteboard.Connection', {
         }
     },
 
+    /**
+     * Draw from stored data incoming from server
+     * Called when server sends @event 'draw-many'
+     * @param {Object} self
+     * @param {datas:[points...]} data
+     */
     remoteDrawMany : function(self, data)
     {
-        self.whiteboard.clear();
+        //self.whiteboard.clear(); 
         ds = data.datas;
         for (d in ds) {
             if (ds[d] === null)
@@ -147,11 +185,23 @@ Ext.define('Whiteboard.Connection', {
         }
     },
 
+    /**
+     * Clear from server
+     * Called when server sends @event 'clear'
+     * @param {Object} self
+     * @param {Object} data
+     */
     remoteClear : function(self, data)
     {
         self.whiteboard.clear(false);
     },
 
+    /**
+     * Notification from server that video is ready
+     * Called when server sends @event 'made-video'
+     * @param {Object} self
+     * @param {Object} data
+     */
     remoteMadeVideo : function(self, data)
     {
         // Show dialog box to say the video is done, and show download link for video
@@ -159,12 +209,31 @@ Ext.define('Whiteboard.Connection', {
         window.open("http://"+localUrl+"/collabdraw/test/test.mp4", "Download");
     },
 
+    /**
+     * Notification from server that canvas has been saved
+     * Called when server sends @event 'saved-canvas'
+     * @param {Object} self
+     * @param {Object} data
+     */
     remoteSavedCanvas : function(self, data)
     {
         // show dialog box to say that the canvas has been saved
         this.messageEvent.fireEvent('showMessage', "Canvas saved");
     },
+    
+    remoteImage: function(self, data)
+    {
+        console.log("Got image");
+        var img = document.createElement('img');
+        img.src=data.url;
+        console.log(data.url);
+        console.log(img.width+" "+img.height);
+        self.whiteboard.loadImage(data.url, img.width, img.height);
+    },
 
+    /**
+     * Asks server to save canvas in database
+     */
     save : function()
     {
         this.socket.emit('save-canvas', {
@@ -172,4 +241,13 @@ Ext.define('Whiteboard.Connection', {
             canvasName : this.roomName,
         });
     },
+    
+    getImage: function(page)
+    {
+        console.log("Getting image for page "+page);
+        this.socket.emit('get-image', {
+            uid: this.uid,
+            page: page,   
+        }); 
+    }
 });

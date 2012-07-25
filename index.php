@@ -14,6 +14,7 @@ require_once('config.php');
     <script>
     var localUrl = "<?php echo $local_ip ?>";
     var nodejsPort = <?php echo $nodejs_port ?>;
+    var httpPort = <?php echo $http_port ?>;
     </script>
     
     <!-- Replace with the nodejs server address -->

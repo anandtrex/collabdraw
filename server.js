@@ -5,6 +5,7 @@
      * Web sockets and associated handlers
      */
     var io = require('socket.io').listen(4001);
+    var exec = require('child_process').exec;
     var video = false;
     var db = 'undefined';
 
@@ -33,6 +34,10 @@
                 if (stats.isDirectory()) {
                     // Yes it is
                     // So do nothing
+                    // Throws an exception if the directory doesn't exist
+                }
+                else {
+                    console.log("ERROR: File exists but not a directory!");
                 }
             } catch (e) {
                 // Create the directory
@@ -45,8 +50,22 @@
                     console.log('File could not be saved.');
                 } else {
                     console.log('File saved.');
+                    exec("python pdf2png.py "+"files/"+socket.room + "/" + file.name, donePdf2pngConversion);
+                    function donePdf2pngConversion(){
+                        console.log("Done conversion!");
+                    }
                 };
             });
+        });
+        
+        socket.on('get-image', function(data){
+            var uid = data.uid;
+            var page = data.page;
+            var url = "http://localhost:8888/collabdraw/files/"+socket.room+"/"+page+"_image.png";
+            socket.emit('image', {
+                url : url,
+                page: 1,
+            })
         });
 
         socket.on('drawClick', function(input)
@@ -66,6 +85,7 @@
             }
             socket.broadcast.to(socket.room).emit('draw', {
                 singlePath : singlePath,
+                page: 1,
                 /*
                  x : data.x,
                  y : data.y,
@@ -83,7 +103,7 @@
             if (socket.room) {
                 console.log("Leaving room " + socket.room);
                 socket.leave(socket.room);
-            }
+            }   
             console.log("Joining room " + data.roomName);
             socket.join(data.roomName);
             socket.room = data.roomName;
@@ -124,6 +144,7 @@
 
                         socket.emit('draw-many', {
                             datas : roomDatas[socket.room],
+                            page: 1,
                         });
                     });
                     console.log("Done retrieving!");
@@ -134,6 +155,7 @@
             } else {
                 socket.emit('draw-many', {
                     datas : roomDatas[socket.room],
+                    page: 1,
                 });
             }
         });
@@ -159,7 +181,7 @@
             console.log("Saving png");
             var Canvas = require('canvas'), canvas = new Canvas(920, 550);
             var sys = require('sys');
-            var exec = require('child_process').exec;
+            
             function doVideo(error, stdout, stderr)
             {
                 sys.puts(stdout);
