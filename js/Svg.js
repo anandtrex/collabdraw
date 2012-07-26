@@ -10,11 +10,13 @@ Ext.define('Whiteboard.Svg', {
     cvs : 'undefined',
     lw : 'undefined',
     lc : 'undefined',
-    color: 'black',
+    color : 'black',
     oldx : -1,
     oldy : -1,
     currentPage : 1,
-    totalPages : 1,
+    totalPages : 10,
+    uid: "",
+    room: "",
 
     /**
      * Connection to server
@@ -28,6 +30,8 @@ Ext.define('Whiteboard.Svg', {
 
         this.connection = Ext.create('Whiteboard.Connection', nodejsAddress, this);
         this.connection.init(uid, room, 1);
+        this.uid = uid;
+        this.room = room;
     },
 
     /**
@@ -182,13 +186,14 @@ Ext.define('Whiteboard.Svg', {
         console.log("Loading");
         this.cvs.image(url, 0, 0, width, height);
     },
-    
-    getImage: function(){
-       images = document.getElementsByTagName("image");
-       if(images.length == 0)
-        this.connection.getImage(this.currentPage);
-       else
-        console.log("One image already loaded");  
+
+    getImage : function()
+    {
+        images = document.getElementsByTagName("image");
+        if (images.length == 0)
+            this.connection.getImage(this.currentPage);
+        else
+            console.log("One image already loaded");
     },
 
     /**
@@ -196,11 +201,12 @@ Ext.define('Whiteboard.Svg', {
      */
     nextPage : function()
     {
-        currentPage += 1;
-        if (currentPage > totalPages) {
+        this.currentPage += 1;
+        if (this.currentPage > this.totalPages) {
             // Blank canvas
         } else {
-            // load next image and canvas
+            this.cvs.clear();
+            this.connection.init(this.uid, this.room, this.currentPage);
         }
     },
 
@@ -210,15 +216,16 @@ Ext.define('Whiteboard.Svg', {
     prevPage : function()
     {
 
-        if (currentPage - 1 <= 0) {
+        if (this.currentPage - 1 <= 0) {
             // do nothing
         } else {
-            currentPage -= 1;
-            // load previous canvas
+            this.currentPage -= 1;
+            this.cvs.clear();
+            this.connection.init(this.uid, this.room, this.currentPage);
         }
     },
-    
-    getColor: function()
+
+    getColor : function()
     {
         return this.color;
     }

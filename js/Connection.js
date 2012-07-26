@@ -54,19 +54,20 @@ Ext.define('Whiteboard.Connection', {
                 showMessage : function(message)
                 {
 
-                    var msgOverlay = Ext.create('Ext.Panel', {
-                        //floating        : true,
+                    var msgOverlay = Ext.create('Ext.Container', {
                         hidden : true,
                         height : 30,
                         width : '20%',
                         scrollable : false,
-                        //hideOnMaskTap: true,
                         border : 'none',
                         margin : '0',
                         docked : 'top',
-                        //top: '5px',
                         left : '40%',
                         html : '',
+                        centered: true,
+                        style: {
+                            background: "#989898",
+                        },
                     });
                     // Required for being able to show the overlay
                     Ext.Viewport.add(msgOverlay);
@@ -80,45 +81,7 @@ Ext.define('Whiteboard.Connection', {
             }
         });
     },
-
-    /**
-     * Send a single path (segment) to the server
-     * @param {x, y, type, lineColor, lineWidth} a point on the path
-     */
-    sendPath : function(data)
-    {
-        this.singlePath.push(data);
-        this.currentPathLength++;
-        // Send path every two points or when user removes finger
-        if (this.currentPathLength > 2 || data.type === "touchend") {
-            this.socket.emit('drawClick', {
-                singlePath : this.singlePath,
-            });
-            this.singlePath = [];
-            this.currentPathLength = 0;
-        }
-    },
-
-    /**
-     * Clear all other canvases (in the same room on the same page)
-     */
-    sendClear : function()
-    {
-        this.socket.emit('clear', {
-            uid : this.uid,
-        });
-    },
-
-    /**
-     * Make video remotely
-     */
-    makeVideo : function()
-    {
-        this.socket.emit('video', {
-            uid : this.uid,
-        });
-    },
-
+    
     /**
      * Get data from server to initialize this whiteboard
      * @param {Object} uid
@@ -132,8 +95,73 @@ Ext.define('Whiteboard.Connection', {
         this.roomName = roomName;
         this.page = page;
 
-        this.getImage(page);
+        this.getImage();
     },
+    
+    getImage : function()
+    {
+        console.log("Getting image for page " + this.page);
+        this.socket.emit('get-image', {
+            uid : this.uid,
+            page : this.page,
+        });
+    },
+
+    /**
+     * Send a single path (segment) to the server
+     * @param {x, y, type, lineColor, lineWidth} a point on the path
+     */
+    sendPath : function(data)
+    {
+        this.singlePath.push(data);
+        this.currentPathLength++;
+        // Send path every two points or when user removes finger
+        if (this.currentPathLength > 2 || data.type === "touchend") {
+            this.socket.emit('draw-click', {
+                singlePath : this.singlePath,
+                page: this.page,
+            });
+            this.singlePath = [];
+            this.currentPathLength = 0;
+        }
+    },
+
+    /**
+     * Clear all other canvases (in the same room on the same page)
+     */
+    sendClear : function()
+    {
+        this.socket.emit('clear', {
+            uid : this.uid,
+            page: this.page,
+        });
+    },
+    
+     /**
+     * Asks server to save canvas in database
+     */
+    save : function()
+    {
+        this.socket.emit('save-canvas', {
+            uid : this.uid,
+            canvasName : this.roomName,
+            page: this.page,
+        });
+    },
+
+    /**
+     * Make video remotely
+     */
+    makeVideo : function()
+    {
+        this.socket.emit('video', {
+            uid : this.uid,
+        });
+    },
+    
+    /***
+     * All remote functions below
+     */
 
     /**
      * Draw from realtime data incoming from server
@@ -229,30 +257,11 @@ Ext.define('Whiteboard.Connection', {
             console.log(data.url);
             self.whiteboard.loadImage(data.url, data.width, data.height);
         }
+        console.log("Sending init with roomName "+this.roomName+" and page "+this.page);
         this.socket.emit('init', {
             uid : this.uid,
             roomName : this.roomName,
             page : this.page,
         });
     },
-
-    /**
-     * Asks server to save canvas in database
-     */
-    save : function()
-    {
-        this.socket.emit('save-canvas', {
-            uid : this.uid,
-            canvasName : this.roomName,
-        });
-    },
-
-    getImage : function(page)
-    {
-        console.log("Getting image for page " + page);
-        this.socket.emit('get-image', {
-            uid : this.uid,
-            page : page,
-        });
-    }
 });

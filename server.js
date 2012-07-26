@@ -9,8 +9,7 @@
     var video = false;
     var db = 'undefined';
 
-    //var i = 0;
-    var roomDatas = [];
+    var paths = [];
 
     io.sockets.on('connection', function(socket)
     {
@@ -23,6 +22,71 @@
         var dl = require('delivery');
         var fs = require('fs');
         var delivery = dl.listen(socket);
+
+        db_connector.open(function(error, client)
+        {
+            if (error)
+                throw error;
+            db = client;
+        });
+
+        socket.on('init', function(data)
+        {
+            console.log("Initializing");
+            // TODO compress datas before emitting
+            if (socket.room) {
+                console.log("Leaving room " + socket.room);
+                socket.leave(socket.room);
+            }
+
+            console.log("Joining room " + data.roomName);
+            console.log("canvas name", data.roomName);
+            console.log("page", data.page);
+
+            socket.join(data.roomName);
+            socket.room = data.roomName;
+            var page = data.page;
+
+            if (!paths[socket.room] || !paths[socket.room][page]) {
+                if (!paths[socket.room]) {
+                    paths[socket.room] = [];
+                }
+                paths[socket.room][page] = [];
+                console.log("Getting data from db");
+
+                var collection = new mongodb.Collection(db, data.uid);
+                canvasName = data.roomName;
+                collection.find({
+                    canvas_name : data.roomName,
+                    page : data.page,
+                }).toArray(function(err, results)
+                {
+                    if (err)
+                        throw err;
+                    if (results.length == 0) {
+                        paths[socket.room][page] = [];
+                    } else {
+                        paths[socket.room][page] = results[results.length - 1].paths;
+                    }
+
+                    while (paths[socket.room][page].length > 1 && paths[socket.room][page][0] == null) {
+                        paths[socket.room][page].shift();
+                        console.log("Discarding top of paths");
+                    }
+
+                    socket.emit('draw-many', {
+                        datas : paths[socket.room][page],
+                        page : data.page,
+                    });
+                });
+                console.log("Done retrieving!");
+            } else {
+                socket.emit('draw-many', {
+                    datas : paths[socket.room][page],
+                    page : data.page,
+                });
+            }
+        });
 
         delivery.on('receive.success', function(file)
         {
@@ -53,7 +117,7 @@
                     function donePdf2pngConversion()
                     {
                         console.log("Done conversion!");
-                        socket.emit('pdf-conversion-done',{
+                        socket.emit('pdf-conversion-done', {
                         });
                     }
 
@@ -84,8 +148,8 @@
                             throw err;
                         console.log("gm value " + JSON.stringify(value));
                         socket.emit('image', {
-                            url : "http://128.83.74.33:8888/collabdraw/"+url+"?1",
-                            page : 1,
+                            url : "http://128.83.74.33:8888/collabdraw/" + url + "?1",
+                            page : page,
                             width : value.width,
                             height : value.height,
                         });
@@ -94,122 +158,109 @@
             } catch (e) {
                 socket.emit('image', {
                     url : "",
-                    page : 1,
+                    page : page,
                     width : 0,
                     height : 0,
                 });
             }
         });
 
-        socket.on('drawClick', function(input)
+        socket.on('draw-click', function(input)
         {
             console.log("Receiving path");
             var singlePath = input.singlePath;
+            var page = input.page;
             var data = {};
+            if (!paths[socket.room] || !paths[socket.room][page]) {
+                if(!paths[socket.room]){
+                    paths[socket.room] = [];
+                }
+                paths[socket.room][page] = [];
+            }
             for (d in singlePath) {
                 data = singlePath[d];
-                //console.log("Datas: "+JSON.stringify(datas));
-                // console.log("Length of data:"+datas.length);
-                if (!roomDatas[socket.room]) {
-                    roomDatas[socket.room] = [];
-                }
-                roomDatas[socket.room].push(data);
-                //i++;
+                paths[socket.room][page].push(data);
             }
             socket.broadcast.to(socket.room).emit('draw', {
                 singlePath : singlePath,
-                page : 1,
-                /*
-                 x : data.x,
-                 y : data.y,
-                 type : data.type,
-                 lineColor : data.lineColor,
-                 lineWidth : data.lineWidth,*/
+                page : input.page,
             });
         });
 
-        socket.on('init', function(data)
+        socket.on('clear', function(data)
         {
-            console.log("Initializing");
-            //console.log("data: " + JSON.stringify(data));
-            // TODO compress datas before emitting
-            if (socket.room) {
-                console.log("Leaving room " + socket.room);
-                socket.leave(socket.room);
-            }
-            console.log("Joining room " + data.roomName);
-            socket.join(data.roomName);
-            socket.room = data.roomName;
-            //roomDatas[socket.room] = [];
-            if (!roomDatas[socket.room]) {
-                roomDatas[socket.room] = [];
-                // console.log("data: " + JSON.stringify(data));
-                console.log("Getting data from db");
-
-                // console.log("in getDataFromDb with uid " + data.uid + " and room name " +
-                // data.roomName);
-                db_connector.open(function(error, client)
-                {
-                    if (error)
-                        throw error;
-                    var collection = new mongodb.Collection(client, data.uid);
-                    canvasName = data.roomName;
-                    console.log("canvas name", data.roomName);
-                    collection.find({
-                        canvasName : data.roomName
-                    }).toArray(function(err, results)
-                    {
-                        if (err)
-                            throw err;
-                        //console.log("These are the results: " + JSON.stringify(results));
-                        //console.log("Length of results: "+results.length);
-                        if (results.length == 0) {
-                            //console.log("Empty init");
-                            roomDatas[socket.room] = [];
-                        } else {
-                            roomDatas[socket.room] = results[results.length - 1].datas;
-                        }
-
-                        while (roomDatas[socket.room].length > 1 && roomDatas[socket.room][0] == null) {
-                            roomDatas[socket.room].shift();
-                            console.log("Discarding top of roomDatas");
-                        }
-
-                        socket.emit('draw-many', {
-                            datas : roomDatas[socket.room],
-                            page : 1,
-                        });
-                    });
-                    console.log("Done retrieving!");
-                    //client.close();
-                    db = client;
-                });
-
-            } else {
-                socket.emit('draw-many', {
-                    datas : roomDatas[socket.room],
-                    page : 1,
-                });
-            }
-        });
-
-        socket.on('clear', function(uid)
-        {
-            roomDatas[socket.room] = [];
+            paths[socket.room][data.page] = [];
             socket.broadcast.to(socket.room).emit('clear', {
-                uid : uid,
-                page: 1,
+                uid : data.uid,
+                page : data.page,
             });
         });
 
-        socket.on('video', function(uid)
+        /**
+         * Saves the canvas
+         */
+        socket.on('save-canvas', function(data)
+        {
+            console.log("Saving canvas");
+            var uid = data.uid;
+            var page = data.page;
+            canvasName = data.canvasName;
+
+            var collection = new mongodb.Collection(db, uid);
+
+            console.log("canvas name", canvasName);
+            console.log("Removing old saves");
+            collection.remove({
+                canvas_name : canvasName,
+                page : page
+            });
+            console.log("Inserting new saves");
+            collection.insert({
+                type : "canvas",
+                canvas_name : canvasName,
+                page : page,
+                paths : paths[socket.room][page],
+                timestamp : new Date().getTime()
+            });
+            console.log("Done inserting!");
+            socket.emit('saved-canvas', {
+                uid : uid,
+                page : page,
+            });
+        });
+
+        socket.on('getCanvasList', function(data)
+        {
+            var uid = data.uid;
+            db_connector.open(function(error, client)
+            {
+                if (error)
+                    throw error;
+                var collection = new mongoDb.Collection(client, uid);
+                var cursor = collection.find({}, {
+                    'canvasName' : 1
+                });
+                var canvasList = [];
+                cursor.each(function(err, doc)
+                {
+                    if (err)
+                        console.log("Error cursor: " + err);
+                    console.log("doc: " + JSON.stringify(doc));
+                });
+                socket.emit('canvasList', {
+                    canvasList : canvasList,
+                })
+            });
+        });
+
+        socket.on('video', function(data)
         {
             if (video == false) {
                 socket.emit('message', {
                     message : "This is not available at this time. Please try again later."
                 })
                 return;
-            } 
+            }
             console.log("Saving png");
             var Canvas = require('canvas'), canvas = new Canvas(920, 550);
             var sys = require('sys');
@@ -258,9 +309,9 @@
                     writtenNo = i;
                     //console.log(i);
                 }
-                for (var d = 0; d < roomDatas[socket.room].length; d++) {
-                    if (roomDatas[socket.room][d] == null || roomDatas[socket.room][d] == undefined || roomDatas[socket.room][d] == "undefined") {
-                        console.log("null or undefined data in roomDatas[socket.room][d] for d = " + d + "!");
+                for (var d = 0; d < paths[socket.room][data.page].length; d++) {
+                    if (paths[socket.room][data.page][d] == null || paths[socket.room][data.page][d] == undefined || paths[socket.room][data.page][d] == "undefined") {
+                        console.log("null or undefined data in paths[socket.room][data.page][d] for d = " + d + "!");
                         continue;
                     }
                     xyz(d);
@@ -270,10 +321,10 @@
                     setTimeout(function()
                     {
                         try {
-                            draw(canvas, roomDatas[socket.room][d].x, roomDatas[socket.room][d].y, roomDatas[socket.room][d].type, roomDatas[socket.room][d].lineColor, roomDatas[socket.room][d].lineWidth);
+                            draw(canvas, paths[socket.room][data.page][d].x, paths[socket.room][data.page][d].y, paths[socket.room][data.page][d].type, paths[socket.room][data.page][d].lineColor, paths[socket.room][data.page][d].lineWidth);
                         } catch(err) {
                             console.log("Error: " + err);
-                            console.log("This is the roomDatas[socket.room][d] " + roomDatas[socket.room][d]);
+                            console.log("This is the paths[socket.room][data.page][d] " + paths[socket.room][data.page][d]);
                             return;
                         }
 
@@ -317,61 +368,6 @@
             exec("./delete_files.sh", doVideo);
             video = false;
         });
-        /**
-         * Saves the canvas
-         */
-        socket.on('save-canvas', function(data)
-        {
-            console.log("Saving canvas");
-            //db_connector.open(function(error, client)
-            //{
-            //if (error)
-            //    throw error;
-            var uid = data.uid;
-            var collection = new mongodb.Collection(db, uid);
-            canvasName = data.canvasName;
-            console.log("canvas name", canvasName);
-            console.log("Removing old saves");
-            collection.remove({
-                canvasName : canvasName
-            });
-            console.log("Inserting new saves");
-            collection.insert({
-                type : "canvas",
-                canvasName : canvasName,
-                datas : roomDatas[socket.room],
-                timestamp : new Date().getTime()
-            });
-            console.log("Done inserting!");
-            socket.emit('saved-canvas', {
-                uid : uid,
-            });
-            //client.close();
-            //});
-        });
 
-        socket.on('getCanvasList', function(data)
-        {
-            var uid = data.uid;
-            db_connector.open(function(error, client)
-            {
-                if (error)
-                    throw error;
-                var collection = new mongoDb.Collection(client, uid);
-                var cursor = collection.find({}, {
-                    'canvasName' : 1
-                });
-                var canvasList = [];
-                cursor.each(function(err, doc)
-                {
-                    if (err)
-                        console.log("Error cursor: " + err);
-                    console.log("doc: " + JSON.stringify(doc));
-                });
-                socket.emit('canvasList', {
-                    canvasList : canvasList,
-                })
-            });
-        });
     });
 }).call(this);

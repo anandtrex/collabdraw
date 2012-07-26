@@ -286,7 +286,7 @@ Ext.application({
                 },*/
                {
                     xtype: 'button',
-                    text: 'New',
+                    text: 'Blank',
                     ui: 'normal',
                     cls: 'action-button',
                     listeners:{
@@ -298,7 +298,7 @@ Ext.application({
                 {
                     xtype: 'button',
                     text: 'Previous',
-                    ui: 'normal',
+                    ui: 'action',
                     cls: 'action-button',
                     listeners:{
                         tap: function(){
@@ -309,7 +309,7 @@ Ext.application({
                 {
                     xtype: 'button',
                     text: 'Next',
-                    ui: 'normal',
+                    ui: 'action',
                     cls: 'action-button',
                     listeners:{
                         tap: function(){
