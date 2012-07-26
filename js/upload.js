@@ -29,8 +29,10 @@ function uploadFile()
         {
             console.log("file was successfully sent.");
             var uploadResponse = document.getElementById('uploadResponse');
-            uploadResponse.innerHTML = "File successfully sent";
             uploadResponse.style.display = 'block';
+            socket.on('pdf-conversion-done', function(){
+                uploadResponse.innerHTML = "File successfully sent";
+            })
         });
     });
 }

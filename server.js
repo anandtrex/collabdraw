@@ -15,7 +15,7 @@
     io.sockets.on('connection', function(socket)
     {
         socket.room = "one";
-        
+
         var mongodb = require('mongodb');
         var server = new mongodb.Server("127.0.0.1", 27017, {});
         var db_connector = new mongodb.Db("coll_canv", server, {});
@@ -28,44 +28,77 @@
         {
             try {
                 // Query the entry
-                stats = fs.lstatSync("files/"+socket.room);
+                stats = fs.lstatSync("files/" + socket.room);
 
                 // Is it a directory?
                 if (stats.isDirectory()) {
                     // Yes it is
                     // So do nothing
                     // Throws an exception if the directory doesn't exist
-                }
-                else {
+                } else {
                     console.log("ERROR: File exists but not a directory!");
                 }
             } catch (e) {
                 // Create the directory
-                fs.mkdirSync("files/"+socket.room);
+                fs.mkdirSync("files/" + socket.room);
             }
 
-            fs.writeFile("files/"+socket.room + "/" + file.name, file.buffer, function(err)
+            fs.writeFile("files/" + socket.room + "/" + file.name, file.buffer, function(err)
             {
                 if (err) {
                     console.log('File could not be saved.');
                 } else {
                     console.log('File saved.');
-                    exec("python pdf2png.py "+"files/"+socket.room + "/" + file.name, donePdf2pngConversion);
-                    function donePdf2pngConversion(){
+                    exec("python pdf2png.py " + "files/" + socket.room + "/" + file.name, donePdf2pngConversion);
+                    function donePdf2pngConversion()
+                    {
                         console.log("Done conversion!");
+                        socket.emit('pdf-conversion-done',{
+                        });
                     }
+
                 };
             });
         });
-        
-        socket.on('get-image', function(data){
+
+        socket.on('get-image', function(data)
+        {
             var uid = data.uid;
             var page = data.page;
-            var url = "http://localhost:8888/collabdraw/files/"+socket.room+"/"+page+"_image.png";
-            socket.emit('image', {
-                url : url,
-                page: 1,
-            })
+            var url = "files/" + socket.room + "/" + page + "_image.png";
+            // http://128.83.74.33:8888/collabdraw
+            console.log("hmm " + url);
+
+            var fs = require('fs');
+            try {
+                // Query the entry
+                stats = fs.lstatSync(url);
+
+                // Is it a file?
+                if (stats.isFile()) {
+                    var gm = require('gm');
+
+                    gm(url).size(function(err, value)
+                    {
+                        if (err)
+                            throw err;
+                        console.log("gm value " + JSON.stringify(value));
+                        socket.emit('image', {
+                            url : "http://128.83.74.33:8888/collabdraw/"+url+"?1",
+                            page : 1,
+                            width : value.width,
+                            height : value.height,
+                        });
+                    });
+                }
+            } catch (e) {
+                socket.emit('image', {
+                    url : "",
+                    page : 1,
+                    width : 0,
+                    height : 0,
+                });
+            }
         });
 
         socket.on('drawClick', function(input)
@@ -85,7 +118,7 @@
             }
             socket.broadcast.to(socket.room).emit('draw', {
                 singlePath : singlePath,
-                page: 1,
+                page : 1,
                 /*
                  x : data.x,
                  y : data.y,
@@ -103,7 +136,7 @@
             if (socket.room) {
                 console.log("Leaving room " + socket.room);
                 socket.leave(socket.room);
-            }   
+            }
             console.log("Joining room " + data.roomName);
             socket.join(data.roomName);
             socket.room = data.roomName;
@@ -144,18 +177,18 @@
 
                         socket.emit('draw-many', {
                             datas : roomDatas[socket.room],
-                            page: 1,
+                            page : 1,
                         });
                     });
                     console.log("Done retrieving!");
                     //client.close();
                     db = client;
                 });
-                
+
             } else {
                 socket.emit('draw-many', {
                     datas : roomDatas[socket.room],
-                    page: 1,
+                    page : 1,
                 });
             }
         });
@@ -165,23 +198,22 @@
             roomDatas[socket.room] = [];
             socket.broadcast.to(socket.room).emit('clear', {
                 uid : uid,
+                page: 1,
             });
         });
 
         socket.on('video', function(uid)
         {
-            if (video == true) {
+            if (video == false) {
                 socket.emit('message', {
                     message : "This is not available at this time. Please try again later."
                 })
                 return;
-            } else {
-                video = true;
-            }
+            } 
             console.log("Saving png");
             var Canvas = require('canvas'), canvas = new Canvas(920, 550);
             var sys = require('sys');
-            
+
             function doVideo(error, stdout, stderr)
             {
                 sys.puts(stdout);
@@ -293,28 +325,28 @@
             console.log("Saving canvas");
             //db_connector.open(function(error, client)
             //{
-                //if (error)
-                //    throw error;
-                var uid = data.uid;
-                var collection = new mongodb.Collection(db, uid);
-                canvasName = data.canvasName;
-                console.log("canvas name", canvasName);
-                console.log("Removing old saves");
-                collection.remove({
-                    canvasName : canvasName
-                });
-                console.log("Inserting new saves");
-                collection.insert({
-                    type : "canvas",
-                    canvasName : canvasName,
-                    datas : roomDatas[socket.room],
-                    timestamp : new Date().getTime()
-                });
-                console.log("Done inserting!");
-                socket.emit('saved-canvas', {
-                    uid : uid,
-                });
-                //client.close();
+            //if (error)
+            //    throw error;
+            var uid = data.uid;
+            var collection = new mongodb.Collection(db, uid);
+            canvasName = data.canvasName;
+            console.log("canvas name", canvasName);
+            console.log("Removing old saves");
+            collection.remove({
+                canvasName : canvasName
+            });
+            console.log("Inserting new saves");
+            collection.insert({
+                type : "canvas",
+                canvasName : canvasName,
+                datas : roomDatas[socket.room],
+                timestamp : new Date().getTime()
+            });
+            console.log("Done inserting!");
+            socket.emit('saved-canvas', {
+                uid : uid,
+            });
+            //client.close();
             //});
         });
 

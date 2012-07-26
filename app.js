@@ -104,7 +104,86 @@ Ext.application({
                 },
                 {
                     xtype: 'button',
-                    text: 'More Options',
+                    //text: 'Pen',
+                    ui: 'round',
+                    style: 'background:black',
+                    cls: 'action-button',
+                    id: 'color-selector',
+                    listeners:{
+                        tap: function(){
+                            var moreOptionsOverlay = Ext.create('Ext.Container', {
+                                floating        : true,
+                                modal           : true,
+                                hidden          : true,
+                                hideOnMaskTap: true,
+                                border: 0,
+                                control: {
+                                   'button': {
+                                       tap: function()
+                                       {
+                                           this.hide();
+                                       }
+                                   }
+                                },
+                                items: [
+                                    {
+                                      xtype: 'button',
+                                      ui: 'round',
+                                      style: 'background:blue',
+                                      cls: 'action-button',
+                                      listeners: {
+                                          tap: function() {
+                                              whiteboard.setPen('blue');
+                                              Ext.getCmp('color-selector').setStyle('background:blue');
+                                          }
+                                      }
+                                    },
+                                    {
+                                      xtype: 'button',
+                                      ui: 'round',
+                                      style: 'background:black',
+                                      cls: 'action-button',
+                                      listeners: {
+                                          tap: function() {
+                                              whiteboard.setPen('black');
+                                              Ext.getCmp('color-selector').setStyle('background:black');
+                                          }
+                                      }
+                                    },
+                                    {
+                                      xtype: 'button',
+                                      ui: 'round',
+                                      style: 'background:red',
+                                      cls: 'action-button',
+                                      listeners: {
+                                          tap: function() {
+                                              whiteboard.setPen('red');
+                                              Ext.getCmp('color-selector').setStyle('background:red');
+                                              
+                                          }
+                                      }
+                                    },
+                                    {
+                                      xtype: 'button',
+                                      ui: 'round',
+                                      style: 'background:green',
+                                      cls: 'action-button',
+                                      listeners: {
+                                          tap: function() {
+                                              whiteboard.setPen('green');
+                                              Ext.getCmp('color-selector').setStyle('background:green');
+                                          }
+                                      }
+                                    },
+                                ]
+                            });
+                            moreOptionsOverlay.showBy(this);
+                        }
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'More Options...',
                     ui: 'action',
                     cls: 'action-button',
                     width: '20%',
@@ -152,7 +231,8 @@ Ext.application({
                                     },
                                     {
                                         xtype: 'button',
-                                        text: 'Get Video',
+                                        text: 'Get Video...',
+                                        ui: 'plain',
                                         cls: 'action-button',
                                         height: 30,
                                         listeners: {
@@ -163,14 +243,14 @@ Ext.application({
                                     },
                                     {
                                         xtype: 'button',
-                                        text: 'Snapshot',
+                                        text: 'Export to svg',
                                         cls: 'action-button',
                                         height: 30,
                                         listeners: {
                                             tap: function() {
                                                 var svg = document.getElementsByTagName('svg')[0];
                                                 var svg_xml = (new XMLSerializer).serializeToString(svg);
-                                                window.open("data:image/svg+xml;base64,"+btoa(svg_xml), "Snapshot");
+                                                window.open("data:image/svg+xml;base64,"+btoa(svg_xml), "Export");
                                             }
                                         }
                                     }, 
@@ -185,36 +265,17 @@ Ext.application({
                                             }
                                         }
                                     },
-                                    {
-                                        xtype: 'button',
-                                        text: 'Load first image',
-                                        cls: 'action-button',
-                                        height: 30,
-                                        listeners: {
-                                            tap: function() {
-                                                /*
-                                                var img = document.createElement('img');
-                                                //var img2 = new Image();
-                                                //img2.src='http://localhost:8888/collabdraw/files/one/Neuron_Hand_tuned.png';
-                                                //console.log(img2.height);
-                                                img.src='http://localhost:8888/collabdraw/files/one/Neuron_Hand_tuned.png';
-                                                console.log(img.width+" "+img.height);
-                                                whiteboard.loadImage("http://localhost:8888/collabdraw/files/one/Neuron_Hand_tuned.png", img.width, img.height);
-                                                */
-                                               whiteboard.getImage();
-                                            }
-                                        }
-                                    }                                   
                                 ]
                             });
                             moreOptionsOverlay.showBy(this);
                         }
                     }
                 },
+                /*
                 {
                     xtype: 'button',
                     text: 'Chat',
-                    ui: 'action',
+                    ui: 'normal',
                     cls: 'action-button',
                     width: '30%',
                     listeners:{
@@ -222,11 +283,22 @@ Ext.application({
                             
                         }
                     }
+                },*/
+               {
+                    xtype: 'button',
+                    text: 'New',
+                    ui: 'normal',
+                    cls: 'action-button',
+                    listeners:{
+                        tap: function(){
+                            //whiteboard.prevPage();
+                        }
+                    }
                 },
                 {
                     xtype: 'button',
                     text: 'Previous',
-                    ui: 'action',
+                    ui: 'normal',
                     cls: 'action-button',
                     listeners:{
                         tap: function(){
@@ -237,11 +309,21 @@ Ext.application({
                 {
                     xtype: 'button',
                     text: 'Next',
-                    ui: 'action',
+                    ui: 'normal',
                     cls: 'action-button',
                     listeners:{
                         tap: function(){
                             whiteboard.nextPage();
+                        }
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Goto...',
+                    ui: 'normal',
+                    cls: 'action-button',
+                    listeners:{
+                        tap: function(){
                         }
                     }
                 },

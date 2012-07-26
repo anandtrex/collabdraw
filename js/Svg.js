@@ -10,6 +10,7 @@ Ext.define('Whiteboard.Svg', {
     cvs : 'undefined',
     lw : 'undefined',
     lc : 'undefined',
+    color: 'black',
     oldx : -1,
     oldy : -1,
     currentPage : 1,
@@ -158,9 +159,10 @@ Ext.define('Whiteboard.Svg', {
      * Set color of pen
      * @param {Object} colour
      */
-    setPen : function(colour)
+    setPen : function(color)
     {
-        this.setParams(colour, "3px");
+        this.setParams(color, "3px");
+        this.color = color;
     },
 
     /**
@@ -214,5 +216,10 @@ Ext.define('Whiteboard.Svg', {
             currentPage -= 1;
             // load previous canvas
         }
+    },
+    
+    getColor: function()
+    {
+        return this.color;
     }
 });
