@@ -5,16 +5,13 @@
      * Web sockets and associated handlers
      */
     var io = require('socket.io').listen(4001);
-    var exec = require('child_process').exec;
-    var video = false;
     var db = 'undefined';
-
-    var paths = [];
 
     io.sockets.on('connection', function(socket)
     {
         socket.room = "one";
-
+        var video = false;
+        var exec = require('child_process').exec;
         var mongodb = require('mongodb');
         var server = new mongodb.Server("127.0.0.1", 27017, {});
         var db_connector = new mongodb.Db("coll_canv", server, {});
@@ -22,6 +19,8 @@
         var dl = require('delivery');
         var fs = require('fs');
         var delivery = dl.listen(socket);
+
+        var allPaths = {};
 
         db_connector.open(function(error, client)
         {
@@ -32,59 +31,113 @@
 
         socket.on('init', function(data)
         {
+            console.log("PATHS IS " + JSON.stringify(allPaths));
             console.log("Initializing");
+
             // TODO compress datas before emitting
-            if (socket.room) {
+            if (socket.room && socket.room != data.room) {
                 console.log("Leaving room " + socket.room);
                 socket.leave(socket.room);
+
+                console.log("Joining room " + data.room);
+                socket.join(data.room);
+                socket.room = data.room;
             }
 
-            console.log("Joining room " + data.roomName);
-            console.log("canvas name", data.roomName);
+            var pageNo = parseInt(data.page);
+            var canvasName = data.room;
+            console.log("canvas name", data.room);
             console.log("page", data.page);
 
-            socket.join(data.roomName);
-            socket.room = data.roomName;
-            var page = data.page;
-
-            if (!paths[socket.room] || !paths[socket.room][page]) {
-                if (!paths[socket.room]) {
-                    paths[socket.room] = [];
+            if (!allPaths[canvasName] || !allPaths[canvasName][pageNo]) {
+                if (!allPaths[canvasName]) {
+                    console.log("INITIALIZING allPaths[" + canvasName + "] to []");
+                    allPaths[canvasName] = [];
                 }
-                paths[socket.room][page] = [];
-                console.log("Getting data from db");
 
-                var collection = new mongodb.Collection(db, data.uid);
-                canvasName = data.roomName;
+                //console.log("INITIALIZING allPaths[" + canvasName + "][" + pageNo + "] to []");
+                //allPaths[canvasName][pageNo] = [];
+
+                var collection = new mongodb.Collection(db, socket.room);
+                var nPages = 0;
+                var nPagesGot = false;
+
+                if (!allPaths[canvasName]["nPages"]) {
+                    console.log("GETTING number of pages");
+
+                    collection.find({
+                        type : "files_info",
+                        canvas_name : canvasName,
+                    }).toArray(function(err, results)
+                    {
+                        if (err)
+                            throw err;
+
+                        if (results.length == 0) {
+                            nPages = 1;
+                            console.log("NOTE: Canvas files information not found! This is probably because this canvas doesn't have any files associated with it")
+                        } else {
+                            nPages = results[results.length - 1].npages;
+                            console.log("num pages was " + nPages);
+                        }
+
+                        allPaths[canvasName]["nPages"] = nPages;
+
+                        console.log("Outside Paths is " + JSON.stringify(allPaths));
+                        nPagesGot = true;
+                    });
+                } else {
+                    nPagesGot = true;
+                }
+
+                console.log("GETTING data from db");
+
                 collection.find({
-                    canvas_name : data.roomName,
-                    page : data.page,
+                    type : "canvas",
+                    canvas_name : canvasName,
+                    page : pageNo,
                 }).toArray(function(err, results)
                 {
                     if (err)
                         throw err;
                     if (results.length == 0) {
-                        paths[socket.room][page] = [];
+                        console.log("EMPTY RESULTS");
+                        allPaths[canvasName][pageNo] = [];
+                        // Redundant, but here to make things clearer
                     } else {
-                        paths[socket.room][page] = results[results.length - 1].paths;
+                        // Only use the last result
+                        //console.log("Got results " + JSON.stringify(results[results.length -
+                        // 1].paths));
+                        console.log("pageNo is " + pageNo);
+                        console.log("Setting allPaths[" + canvasName + "][" + pageNo + "]");
+                        allPaths[canvasName][pageNo] = results[results.length - 1].paths;
+                        //setAllPaths(results[results.length - 1].paths, canvasName, pageNo);
+                        console.log("allPaths is now " + JSON.stringify(allPaths));
+                        while (allPaths[canvasName][pageNo].length > 1 && allPaths[canvasName][pageNo][0] == null) {
+                            allPaths[canvasName][pageNo].shift();
+                            console.log("Discarding top of allPaths");
+                        }
                     }
 
-                    while (paths[socket.room][page].length > 1 && paths[socket.room][page][0] == null) {
-                        paths[socket.room][page].shift();
-                        console.log("Discarding top of paths");
-                    }
+                    console.log("Done retrieving!");
+                    while (!nPagesGot);
 
                     socket.emit('draw-many', {
-                        datas : paths[socket.room][page],
-                        page : data.page,
+                        datas : allPaths[canvasName][pageNo],
+                        page : pageNo,
+                        npages : nPages,
                     });
                 });
-                console.log("Done retrieving!");
+
             } else {
+                console.log("Already exists. Sending");
+                console.log("Getting allPaths[" + canvasName + "][" + pageNo + "]");
                 socket.emit('draw-many', {
-                    datas : paths[socket.room][page],
-                    page : data.page,
+                    datas : allPaths[canvasName][pageNo],
+                    page : pageNo,
+                    npages : allPaths[canvasName]["nPages"],
                 });
+                console.log("Paths is " + JSON.stringify(allPaths));
             }
         });
 
@@ -113,14 +166,31 @@
                     console.log('File could not be saved.');
                 } else {
                     console.log('File saved.');
-                    exec("python pdf2png.py " + "files/" + socket.room + "/" + file.name, donePdf2pngConversion);
-                    function donePdf2pngConversion()
+                    exec("python pdf2png.py " + "files/" + socket.room + "/" + file.name, function(error, stdout, stderr)
                     {
+                        if (error)
+                            throw error;
                         console.log("Done conversion!");
+                        //console.log("stdout " + stdout);
+                        //console.log("stderr " + stderr);
+                        var lines = stdout.match(/^.*([\n\r]+|$)/gm);
+                        //console.log("pages " + lines[lines.length - 2]);
+                        var pages = parseInt(lines[lines.length - 2].replace(/(\r\n|\n|\r)/gm, ""));
+                        var collection = new mongodb.Collection(db, socket.room);
+                        collection.remove({
+                            type : "files_info",
+                            canvas_name : socket.room,
+                        });
+                        console.log("Inserting new saves");
+                        collection.insert({
+                            type : "files_info",
+                            canvas_name : socket.room,
+                            npages : pages,
+                            timestamp : new Date().getTime()
+                        });
                         socket.emit('pdf-conversion-done', {
                         });
-                    }
-
+                    });
                 };
             });
         });
@@ -148,7 +218,7 @@
                             throw err;
                         console.log("gm value " + JSON.stringify(value));
                         socket.emit('image', {
-                            url : "http://128.83.74.33:8888/collabdraw/" + url + "?1",
+                            url : "http://128.83.74.33:8888/collabdraw/" + url + "?" + Math.random() * 100,
                             page : page,
                             width : value.width,
                             height : value.height,
@@ -171,15 +241,15 @@
             var singlePath = input.singlePath;
             var page = input.page;
             var data = {};
-            if (!paths[socket.room] || !paths[socket.room][page]) {
-                if(!paths[socket.room]){
-                    paths[socket.room] = [];
+            if (!allPaths[socket.room] || !allPaths[socket.room][page]) {
+                if (!allPaths[socket.room]) {
+                    allPaths[socket.room] = [];
                 }
-                paths[socket.room][page] = [];
+                allPaths[socket.room][page] = [];
             }
             for (d in singlePath) {
                 data = singlePath[d];
-                paths[socket.room][page].push(data);
+                allPaths[socket.room][page].push(data);
             }
             socket.broadcast.to(socket.room).emit('draw', {
                 singlePath : singlePath,
@@ -189,7 +259,8 @@
 
         socket.on('clear', function(data)
         {
-            paths[socket.room][data.page] = [];
+            if (allPaths[socket.room])
+                allPaths[socket.room][data.page] = [];
             socket.broadcast.to(socket.room).emit('clear', {
                 uid : data.uid,
                 page : data.page,
@@ -203,29 +274,30 @@
         {
             console.log("Saving canvas");
             var uid = data.uid;
-            var page = data.page;
+            var page = parseInt(data.page);
             canvasName = data.canvasName;
 
-            var collection = new mongodb.Collection(db, uid);
+            var collection = new mongodb.Collection(db, socket.room);
 
             console.log("canvas name", canvasName);
             console.log("Removing old saves");
             collection.remove({
+                type : "canvas",
                 canvas_name : canvasName,
-                page : page
+                page : page,
             });
             console.log("Inserting new saves");
             collection.insert({
                 type : "canvas",
                 canvas_name : canvasName,
                 page : page,
-                paths : paths[socket.room][page],
+                paths : allPaths[socket.room][page],
                 timestamp : new Date().getTime()
             });
             console.log("Done inserting!");
             socket.emit('saved-canvas', {
                 uid : uid,
-                page : page,
+                page : parseInt(page),
             });
         });
 
@@ -236,7 +308,7 @@
             {
                 if (error)
                     throw error;
-                var collection = new mongoDb.Collection(client, uid);
+                var collection = new mongoDb.Collection(client, socket.room);
                 var cursor = collection.find({}, {
                     'canvasName' : 1
                 });
@@ -309,9 +381,9 @@
                     writtenNo = i;
                     //console.log(i);
                 }
-                for (var d = 0; d < paths[socket.room][data.page].length; d++) {
-                    if (paths[socket.room][data.page][d] == null || paths[socket.room][data.page][d] == undefined || paths[socket.room][data.page][d] == "undefined") {
-                        console.log("null or undefined data in paths[socket.room][data.page][d] for d = " + d + "!");
+                for (var d = 0; d < allPaths[socket.room][data.page].length; d++) {
+                    if (allPaths[socket.room][data.page][d] == null || allPaths[socket.room][data.page][d] == undefined || allPaths[socket.room][data.page][d] == "undefined") {
+                        console.log("null or undefined data in allPaths[socket.room][data.page][d] for d = " + d + "!");
                         continue;
                     }
                     xyz(d);
@@ -321,10 +393,10 @@
                     setTimeout(function()
                     {
                         try {
-                            draw(canvas, paths[socket.room][data.page][d].x, paths[socket.room][data.page][d].y, paths[socket.room][data.page][d].type, paths[socket.room][data.page][d].lineColor, paths[socket.room][data.page][d].lineWidth);
+                            draw(canvas, allPaths[socket.room][data.page][d].x, allPaths[socket.room][data.page][d].y, allPaths[socket.room][data.page][d].type, allPaths[socket.room][data.page][d].lineColor, allPaths[socket.room][data.page][d].lineWidth);
                         } catch(err) {
                             console.log("Error: " + err);
-                            console.log("This is the paths[socket.room][data.page][d] " + paths[socket.room][data.page][d]);
+                            console.log("This is the allPaths[socket.room][data.page][d] " + allPaths[socket.room][data.page][d]);
                             return;
                         }
 

@@ -14,7 +14,7 @@ Ext.define('Whiteboard.Svg', {
     oldx : -1,
     oldy : -1,
     currentPage : 1,
-    totalPages : 10,
+    totalPages : 2,
     uid: "",
     room: "",
 
@@ -148,7 +148,7 @@ Ext.define('Whiteboard.Svg', {
         this.cvs.clear();
         if (send)
             this.connection.sendClear();
-        this.getImage();
+        //this.getImage();
     },
 
     /**
@@ -201,11 +201,13 @@ Ext.define('Whiteboard.Svg', {
      */
     nextPage : function()
     {
-        this.currentPage += 1;
-        if (this.currentPage > this.totalPages) {
+        
+        if (this.currentPage + 1 > this.totalPages) {
             // Blank canvas
+            console.log("Total pages was " + this.totalPages + " and current page is " + this.currentPage);
         } else {
-            this.cvs.clear();
+            this.currentPage += 1;
+            //this.cvs.clear();
             this.connection.init(this.uid, this.room, this.currentPage);
         }
     },
@@ -228,5 +230,10 @@ Ext.define('Whiteboard.Svg', {
     getColor : function()
     {
         return this.color;
-    }
+    },
+    
+    setTotalPages: function(pages)
+    {
+        this.totalPages = pages;
+    },
 });

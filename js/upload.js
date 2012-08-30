@@ -30,6 +30,7 @@ function uploadFile()
             console.log("file was successfully sent.");
             var uploadResponse = document.getElementById('uploadResponse');
             uploadResponse.style.display = 'block';
+            uploadResponse.innerHTML = "Please wait... (this may take a few seconds to a few mintues depending on how large your file is)";
             socket.on('pdf-conversion-done', function(){
                 uploadResponse.innerHTML = "File successfully sent";
             })

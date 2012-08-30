@@ -3,10 +3,14 @@
 from subprocess import call
 import os
 from sys import argv
+from glob import glob
 
 if __name__ == "__main__":
     filePath = argv[1]
     fileDir = os.path.split(filePath)[0]
+    for f in glob(fileDir+'/*.png'):
+        os.remove(f)
+        
     fileName = os.path.split(filePath)[1]
     print fileDir
     call(['./helpers/pdf-sam/bin/run-console.sh', '-f=' + filePath, '-o='+fileDir, '-s=BURST', 'split'])
@@ -19,6 +23,8 @@ if __name__ == "__main__":
         os.remove(fileDir+'/'+nextFile)
         i += 1
         nextFile = str(i) + "_" + fileName
+        
+    print i - 1;
         
         
     

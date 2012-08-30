@@ -24,6 +24,8 @@ Ext.define('Whiteboard.Connection', {
         {
             if (spr.whiteboard.currentPage == data.page)
                 spr.remoteDrawMany(spr, data);
+            else
+                console.log("Got data for another page");
         });
         this.socket.on('clear', function(data)
         {
@@ -90,7 +92,7 @@ Ext.define('Whiteboard.Connection', {
      */
     init : function(uid, roomName, page)
     {
-        this.whiteboard.clear();
+        this.whiteboard.clear(true);
         this.uid = uid;
         this.roomName = roomName;
         this.page = page;
@@ -209,6 +211,7 @@ Ext.define('Whiteboard.Connection', {
             else if (ds[d].type == 'touchend')
                 self.whiteboard.endPath(ds[d].x, ds[d].y, false);
         }
+        self.whiteboard.setTotalPages(data.npages);
     },
 
     /**
@@ -260,7 +263,7 @@ Ext.define('Whiteboard.Connection', {
         console.log("Sending init with roomName "+this.roomName+" and page "+this.page);
         this.socket.emit('init', {
             uid : this.uid,
-            roomName : this.roomName,
+            room : this.roomName,
             page : this.page,
         });
     },

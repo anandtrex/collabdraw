@@ -77,6 +77,7 @@ Ext.application({
                     listeners: {
                         tap: function(){
                             whiteboard.clear(true);
+                            whiteboard.getImage();
                         }
                     }
                 },
