@@ -77,17 +77,6 @@ Ext.application({
                 items: [
                 {
                     xtype: 'button',
-                    text: 'Save',
-                    ui: 'action',
-                    cls: 'action-button',
-                    listeners: {
-                        tap: function(){
-                            whiteboard.save();
-                        }
-                    }
-                },
-                {
-                    xtype: 'button',
                     text: 'Clear',
                     ui: 'action',
                     cls: 'action-button',

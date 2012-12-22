@@ -44,6 +44,8 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           logger.error("No event specified")
           return
 
+        key = ''
+
         if event == "init":
           self.room_name = data['room']
           logger.info("Initializing with room name %s" % self.room_name)
@@ -69,9 +71,9 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           self.redis_client.set(key, self.paths)
 
         if event == "clear":
-          logger.debug("Clear event")
           m = json.dumps({'event': 'clear'})
           self.broadcast_message(m)
+          key = "%s" % self.room_name
           self.redis_client.delete(key)
 
     def on_close(self):
@@ -85,6 +87,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
 
 settings = {
     'auto_reload': True,
+    'gzip': True,
 }
 
 application = tornado.web.Application([

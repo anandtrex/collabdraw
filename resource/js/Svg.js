@@ -119,14 +119,6 @@ Ext.define('Whiteboard.Svg', {
     },
 
     /**
-     * Ask server to save canvas
-     */
-    save : function()
-    {
-        this.connection.save();
-    },
-
-    /**
      * Load an image onto the canvas
      * @param {Object} url
      */
