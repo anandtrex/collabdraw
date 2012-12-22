@@ -65,7 +65,6 @@ Ext.application({
                         },
                         painted: function(){
                             whiteboard = Ext.create('Whiteboard.Svg', 1000, 550, uid, room);
-                            whiteboard.init();
                         },
                     }
                 }],
@@ -95,7 +94,7 @@ Ext.application({
                     listeners: {
                         tap: function(){
                             whiteboard.clear(true);
-                            whiteboard.getImage();
+                            //whiteboard.getImage();
                         }
                     }
                 },
@@ -119,7 +118,6 @@ Ext.application({
                     cls: 'action-button',
                     listeners:{
                         tap: function(){
-                            //whiteboard.setPen('#000000');
                             curves.color = '#000000';
                             curves.width = '3px';
                         }
@@ -156,7 +154,6 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              //whiteboard.setPen('blue');
                                               curves.color = 'blue';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:blue');
@@ -170,7 +167,6 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              //whiteboard.setPen('black');
                                               curves.color = 'black';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:black');
@@ -184,7 +180,6 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              //whiteboard.setPen('red');
                                               curves.color = 'red';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:red');
@@ -199,7 +194,6 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              //whiteboard.setPen('green');
                                               curves.color = 'green';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:green');

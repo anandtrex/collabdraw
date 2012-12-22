@@ -10,6 +10,7 @@ import tornado.web
 import redis
 
 LISTENERS = []
+
 logger = logging.getLogger('websocket')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
@@ -20,32 +21,35 @@ def redis_listener():
     r.subscribe('one')
     for message in r.listen():
       for listener in LISTENERS:
-        message_data = json.loads(message['data'].decode('utf-8').replace("'",'"'))
-        m = json.dumps({'event': 'draw', 'data': {'singlePath': message_data}})
-        listener.write_message(m)
+        listener.write_message(message['data'])
 
 class RealtimeHandler(tornado.websocket.WebSocketHandler):
     room_name = ''
+    redis_client = None
 
     def open(self):
         LISTENERS.append(self)
         logger.info("Open connection")
         self.write_message(json.dumps({'event': 'ready'}))
         self.paths = []
+        self.redis_client = redis.Redis(host='localhost', db=2)
 
     def on_message(self, message):
         m = json.loads(message)
-        event = m['event'].strip()
-        data = m['data']
+        event = m.get('event', '').strip()
+        data = m.get('data', {})
 
-        r = redis.Redis(host='localhost', db=2)
+        logger.debug("Processing event %s" % event)
+        if not event:
+          logger.error("No event specified")
+          return
 
         if event == "init":
           self.room_name = data['room']
           logger.info("Initializing with room name %s" % self.room_name)
           if not self.paths:
             key = "%s" % self.room_name
-            p = r.get(key)
+            p = self.redis_client.get(key)
             if p:
               self.paths = json.loads(p.decode('utf-8').replace("'",'"'))
               self.write_message(json.dumps({'event':'draw-many', 'data': {'datas':self.paths}}))
@@ -59,14 +63,24 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
             self.paths = []
             
           self.paths.extend(singlePath)
-          LISTENERS.remove(self)
-          r.publish(self.room_name, singlePath)
-          LISTENERS.append(self)
+          m = json.dumps({'event': 'draw', 'data': {'singlePath': singlePath}})
+          self.broadcast_message(m)
           key = "%s" % self.room_name
-          r.set(key, self.paths)
+          self.redis_client.set(key, self.paths)
+
+        if event == "clear":
+          logger.debug("Clear event")
+          m = json.dumps({'event': 'clear'})
+          self.broadcast_message(m)
+          self.redis_client.delete(key)
 
     def on_close(self):
         LISTENERS.remove(self)
+
+    def broadcast_message(self, message):
+        LISTENERS.remove(self)
+        self.redis_client.publish(self.room_name, message)
+        LISTENERS.append(self)
 
 
 settings = {

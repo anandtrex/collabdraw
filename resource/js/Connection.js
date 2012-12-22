@@ -48,7 +48,7 @@ Ext.define('Whiteboard.Connection', {
      */
     init : function(uid, roomName, page)
     {
-        this.whiteboard.clear(true);
+        this.whiteboard.clear(false);
         this.uid = uid;
         this.roomName = roomName;
     },
@@ -63,11 +63,20 @@ Ext.define('Whiteboard.Connection', {
         this.currentPathLength++;
         // Send path every two points or when user removes finger
         if (this.currentPathLength > 2 || data.type === "touchend") {
-            path = JSON.stringify({"event":"draw-click", "data": {"singlePath": this.singlePath}})
-            this.socket.send(path);
+            m = JSON.stringify({"event":"draw-click", "data": {"singlePath": this.singlePath}})
+            this.socket.send(m);
             this.singlePath = [];
             this.currentPathLength = 0;
         }
+    },
+
+    /**
+     * Clear all other canvases (in the same room on the same page)
+     */
+    sendClear : function()
+    {
+        m = JSON.stringify({"event":"clear"});
+        this.socket.send(m);
     },
 
     /***
@@ -89,13 +98,12 @@ Ext.define('Whiteboard.Connection', {
             data = sPath[d];
             if (data == null)
                 continue;
-            //this.whiteboard.setParams(data.lineColor, data.lineWidth);
             if (data.type == 'touchstart')
-                self.whiteboard.startPath(data.oldx, data.oldy, data.lineColor, data.lineWidth);
+                self.whiteboard.startPath(data.oldx, data.oldy, data.lineColor, data.lineWidth, false);
             else if (data.type == 'touchmove')
-                self.whiteboard.continuePath(data.oldx, data.oldy, data.x, data.y, data.lineColor, data.lineWidth);
+                self.whiteboard.continuePath(data.oldx, data.oldy, data.x, data.y, data.lineColor, data.lineWidth, false);
             else if (data.type == 'touchend')
-                self.whiteboard.endPath(data.oldx, data.oldy, data.x, data.y, data.lineColor, data.lineWidth);
+                self.whiteboard.endPath(data.oldx, data.oldy, data.x, data.y, data.lineColor, data.lineWidth, false);
         }
     },
 
@@ -107,12 +115,10 @@ Ext.define('Whiteboard.Connection', {
      */
     remoteDrawMany : function(self, data)
     {
-        //self.whiteboard.clear();
         ds = data.datas;
         for (d in ds) {
             if (ds[d] === null)
                 continue;
-            //self.whiteboard.setParams(ds[d].lineColor, ds[d].lineWidth);
             if (ds[d].type == 'touchstart')
                 self.whiteboard.startPath(ds[d].oldx, ds[d].oldy, ds[d].lineColor, ds[d].lineWidth, false);
             else if (ds[d].type == 'touchmove')
@@ -120,7 +126,7 @@ Ext.define('Whiteboard.Connection', {
             else if (ds[d].type == 'touchend')
                 self.whiteboard.endPath(ds[d].oldx, ds[d].oldy, ds[d].x, ds[d].y, ds[d].lineColor, ds[d].lineWidth, false);
         }
-        self.whiteboard.setTotalPages(data.npages);
+        //self.whiteboard.setTotalPages(data.npages);
     },
 
     /**
