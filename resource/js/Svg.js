@@ -25,7 +25,6 @@ Ext.define('Whiteboard.Svg', {
         this.connection = Ext.create('Whiteboard.Connection', nodejsAddress, this, room);
         this.uid = uid;
         this.room = room;
-        this.connection.init(this.uid, this.room, 1);
     },
 
     /**
@@ -34,7 +33,7 @@ Ext.define('Whiteboard.Svg', {
      */
     joinRoom : function(room)
     {
-        this.connection.init(this.connection.uid, room);
+        this.connection.joinRoom(room);
     },
 
     /**

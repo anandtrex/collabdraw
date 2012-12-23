@@ -12,29 +12,30 @@ import tornado.ioloop
 import tornado.web
 import redis
 
-LISTENERS = []
+LISTENERS = {}
 
 logger = logging.getLogger('websocket')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
 
-def redis_listener():
+def redis_listener(room_name):
+    logger.info("Starting listener thread for room %s" % room_name)
     rr = redis.Redis(host='localhost', db=2)
     r = rr.pubsub()
-    r.subscribe('one')
+    r.subscribe(room_name)
     for message in r.listen():
-      for listener in LISTENERS:
+      for listener in LISTENERS.get(room_name, []):
+        logger.debug("Sending message to room %s" % room_name)
         listener.send_message(message['data'])
 
 class RealtimeHandler(tornado.websocket.WebSocketHandler):
     room_name = ''
+    paths = []
     redis_client = None
 
     def open(self):
-        LISTENERS.append(self)
         logger.info("Open connection")
         self.send_message(json.dumps({'event': 'ready'}))
-        self.paths = []
         self.redis_client = redis.Redis(host='localhost', db=2)
 
     def on_message(self, message):
@@ -50,8 +51,15 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         key = ''
 
         if event == "init":
-          self.room_name = data['room']
           logger.info("Initializing with room name %s" % self.room_name)
+
+          if data['room'] not in LISTENERS:
+            threading.Thread(target=redis_listener, args=(data['room'],)).start()
+
+          self.leave_room(self.room_name)
+          self.room_name = data['room']
+          self.join_room(self.room_name)
+
           if not self.paths:
             key = "%s" % self.room_name
             p = self.redis_client.get(key)
@@ -80,19 +88,34 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           self.redis_client.delete(key)
 
     def on_close(self):
-        LISTENERS.remove(self)
+      self.leave_room(self.room_name)
 
     def broadcast_message(self, message):
-        LISTENERS.remove(self)
-        self.redis_client.publish(self.room_name, message)
-        LISTENERS.append(self)
+      self.leave_room(self.room_name, False)
+      self.redis_client.publish(self.room_name, message)
+      self.join_room(self.room_name)
 
     def send_message(self, message):
-      logger.debug("Length of uncompressed message is %d" % len(message))
-      message = b64encode(compress(bytes(quote(message), 'ascii'), 9))
-      logger.debug("Length of compressed message is %d" % len(message))
+      if type(message) == type(b''):
+        logger.info("Decoding binary string")
+        message = message.decode('utf-8')
+      elif type(message) != type(''):
+        logger.info("Converting message from %s to %s" % (type(message),
+                                                          type('')))
+        message = str(message)
+      message = b64encode(compress(bytes(quote(message), 'utf-8'), 9))
       self.write_message(message)
 
+    def leave_room(self, room_name, clear_paths = True):
+      logger.info("Leaving room %s" % room_name)
+      if self in LISTENERS.get(room_name, []):
+        LISTENERS[room_name].remove(self)
+      if clear_paths:
+        self.paths = []
+
+    def join_room(self, room_name):
+      logger.info("Joining room %s" % room_name)
+      LISTENERS.setdefault(room_name, []).append(self)
 
 settings = {
     'auto_reload': True,
@@ -106,8 +129,6 @@ application = tornado.web.Application([
     (r'/(.*)', tornado.web.StaticFileHandler, dict(path=os.path.dirname(__file__))),
 ], **settings)
 
-t = threading.Thread(target=redis_listener)
-t.start()
 http_server = tornado.httpserver.HTTPServer(application)
 http_server.listen(8888)
 tornado.ioloop.IOLoop.instance().start()

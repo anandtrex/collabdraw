@@ -19,6 +19,7 @@ Ext.define('Whiteboard.Connection', {
         spr = this;
         this.socket.onmessage = function(evt){
           message = JXG.decompress(evt.data);
+          //console.log("Received message "+ message);
           message = JSON.parse(message);
           evnt = message['event'];
           data = message['data'];
@@ -46,11 +47,14 @@ Ext.define('Whiteboard.Connection', {
      * @param {Object} roomName
      * @param {Object} page
      */
-    init : function(uid, roomName, page)
+    joinRoom : function(roomName, page)
     {
         this.whiteboard.clear(false);
-        this.uid = uid;
+        this.singlePath = [];
+        this.currentPathLength = 0;
         this.roomName = roomName;
+        message = JSON.stringify({"event": "init", "data": {"room": this.roomName }});
+        this.socket.send(message);
     },
     
     /**
@@ -75,6 +79,8 @@ Ext.define('Whiteboard.Connection', {
      */
     sendClear : function()
     {
+        this.singlePath = [];
+        this.currentPathLength = 0;
         m = JSON.stringify({"event":"clear"});
         this.socket.send(m);
     },

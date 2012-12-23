@@ -64,6 +64,15 @@ Ext.application({
                             })
                         },
                         painted: function(){
+                            keyValPairStr = document.URL.substring(document.URL.indexOf('#')+1).split(';');
+                            keyValPairs = {}
+                            for(var i = 0; i < keyValPairStr.length; i++){
+                              pair = keyValPairStr[i].split('=');
+                              keyValPairs[pair[0]] = pair[1];
+                            }
+                            
+                            if (typeof keyValPairs['room'] != 'undefined')
+                              room = keyValPairs['room'];
                             whiteboard = Ext.create('Whiteboard.Svg', 1000, 550, uid, room);
                         },
                     }
@@ -75,18 +84,7 @@ Ext.application({
                 style: 'background-color: #5E99CC; padding: 4px',
                 flex: 0,
                 items: [
-                {
-                    xtype: 'button',
-                    text: 'Clear',
-                    ui: 'action',
-                    cls: 'action-button',
-                    listeners: {
-                        tap: function(){
-                            whiteboard.clear(true);
-                            //whiteboard.getImage();
-                        }
-                    }
-                },
+                
                 {
                     xtype: 'button',
                     text: 'Eraser',
@@ -218,6 +216,17 @@ Ext.application({
                                         docked: 'top',
                                         xtype : 'toolbar',
                                         title : 'More Options'
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        text: 'Clear',
+                                        cls: 'action-button',
+                                        listeners: {
+                                            tap: function(){
+                                                whiteboard.clear(true);
+                                                //whiteboard.getImage();
+                                            }
+                                        }
                                     },
                                     {
                                       xtype: 'button',
