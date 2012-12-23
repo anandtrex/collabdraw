@@ -18,8 +18,8 @@ Ext.define('Whiteboard.Connection', {
 
         spr = this;
         this.socket.onmessage = function(evt){
-        //console.log("Received message " + evt.data)
-          message = JSON.parse(evt.data);
+          message = JXG.decompress(evt.data);
+          message = JSON.parse(message);
           evnt = message['event'];
           data = message['data'];
           switch(evnt){

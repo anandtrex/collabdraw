@@ -2,6 +2,9 @@ import logging
 import json
 import os
 import threading
+from zlib import compress
+from urllib.parse import quote
+from base64 import b64encode
 
 import tornado.httpserver
 import tornado.websocket
@@ -21,7 +24,7 @@ def redis_listener():
     r.subscribe('one')
     for message in r.listen():
       for listener in LISTENERS:
-        listener.write_message(message['data'])
+        listener.send_message(message['data'])
 
 class RealtimeHandler(tornado.websocket.WebSocketHandler):
     room_name = ''
@@ -30,7 +33,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         LISTENERS.append(self)
         logger.info("Open connection")
-        self.write_message(json.dumps({'event': 'ready'}))
+        self.send_message(json.dumps({'event': 'ready'}))
         self.paths = []
         self.redis_client = redis.Redis(host='localhost', db=2)
 
@@ -54,7 +57,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
             p = self.redis_client.get(key)
             if p:
               self.paths = json.loads(p.decode('utf-8').replace("'",'"'))
-              self.write_message(json.dumps({'event':'draw-many', 'data': {'datas':self.paths}}))
+              self.send_message(json.dumps({'event':'draw-many', 'data': {'datas':self.paths}}))
             else:
               logger.info("No data in database")
 
@@ -83,6 +86,12 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         LISTENERS.remove(self)
         self.redis_client.publish(self.room_name, message)
         LISTENERS.append(self)
+
+    def send_message(self, message):
+      logger.debug("Length of uncompressed message is %d" % len(message))
+      message = b64encode(compress(bytes(quote(message), 'ascii'), 9))
+      logger.debug("Length of compressed message is %d" % len(message))
+      self.write_message(message)
 
 
 settings = {
