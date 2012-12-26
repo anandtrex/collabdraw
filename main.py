@@ -162,7 +162,7 @@ def process_uploaded_file(file_path):
   dir_path = '/'.join(file_path.split('/')[:-1])
   logger.info("Processing file %s" % file_path)
   subprocess.call(['pdfseparate', file_path, dir_path+'/%d_image.pdf'])
-  subprocess.call(['convert', dir_path+'/*.pdf', dir_path+'/%d_image.png'])
+  subprocess.call(['mogrify', '-format', 'png', '--', dir_path+'/*image.pdf'])
   subprocess.call(['rm', dir_path+'/*image.pdf'])
   logger.info("Finished processing file")
 

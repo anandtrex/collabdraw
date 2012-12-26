@@ -1,5 +1,6 @@
 Ext.require('Whiteboard.MessageEvent');
 
+
 var nodejsAddress = 'ws://192.168.1.134:8888/realtime/';
 
 /**
@@ -110,10 +111,12 @@ Ext.define('Whiteboard.Svg', {
      * Clear canvas
      * @param {Object} send
      */
-    clear : function(send)
+    clear : function(send, reloadImage)
     {
+        reloadImage = typeof reloadImage == 'undefined' ? true : reloadImage;
         this.cvs.clear();
-        this.connection.getImage();
+        if (reloadImage)
+          this.connection.getImage();
         if (send)
             this.connection.sendClear();
     },
@@ -152,7 +155,6 @@ Ext.define('Whiteboard.Svg', {
             console.log("Total pages was " + this.totalPages + " and current page is " + this.currentPage);
         } else {
             this.currentPage += 1;
-            //this.cvs.clear();
             this.connection.init(this.uid, this.room, this.currentPage);
         }
     },
@@ -167,7 +169,6 @@ Ext.define('Whiteboard.Svg', {
             // do nothing
         } else {
             this.currentPage -= 1;
-            this.cvs.clear();
             this.connection.init(this.uid, this.room, this.currentPage);
         }
     },

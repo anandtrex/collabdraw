@@ -52,7 +52,7 @@ Ext.define('Whiteboard.Connection', {
     init: function(uid, room, currentPage)
     {
         console.log("Sending init for room " + room + " and page " + currentPage);
-        this.whiteboard.clear(false);
+        this.whiteboard.clear(false, false);
         this.sendMessage("init", {"room": room, "page": currentPage });
     },
     
