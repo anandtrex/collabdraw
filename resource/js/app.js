@@ -277,7 +277,7 @@ Ext.application({
                                         height: 30,
                                         listeners: {
                                             tap: function() {
-                                                window.open('http://'+localUrl+':'+httpPort+'/collabdraw/upload.php', "Upload");
+                                                window.open('http://192.168.1.134:8888/upload.html#room='+room, "Upload");
                                             }
                                         }
                                     },
