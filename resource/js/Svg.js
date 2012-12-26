@@ -113,6 +113,7 @@ Ext.define('Whiteboard.Svg', {
     clear : function(send)
     {
         this.cvs.clear();
+        this.connection.getImage();
         if (send)
             this.connection.sendClear();
     },
@@ -123,17 +124,21 @@ Ext.define('Whiteboard.Svg', {
      */
     loadImage : function(url, width, height)
     {
-        console.log("Loading");
-        this.cvs.image(url, 0, 0, width, height);
+        console.log("Loading image from " + url);
+        this.cvs.image(url, 5, 5, width, height);
     },
 
     getImage : function()
     {
         images = document.getElementsByTagName("image");
-        if (images.length == 0)
-            this.connection.getImage(this.currentPage);
-        else
-            console.log("One image already loaded");
+        // TODO More specific targetting of image
+        if(images.length != 0){
+            console.log("Images already loaded");
+            for (var i = 0; i < images.length; i++){
+              images[i].parentNode.removeChild(images[i]);
+            }
+        }
+        this.connection.getImage(this.currentPage);
     },
 
     /**

@@ -14,6 +14,7 @@ Ext.define('Whiteboard.Connection', {
         console.log("Connecting to address " + address);
         this.socket = new WebSocket(address);
         this.roomName = room;
+        this.page = 1;
         console.log("Room is " + room);
 
         spr = this;
@@ -24,19 +25,22 @@ Ext.define('Whiteboard.Connection', {
           evnt = message['event'];
           data = message['data'];
           switch(evnt){
-            case 'draw': 
-                spr.remoteDraw(spr, data);
-                break;
-            case 'draw-many':
-                spr.remoteDrawMany(spr, data);
-                break;
-            case 'clear':
-                spr.remoteClear(spr, data);
-                break;
             case 'ready':
-              message = JSON.stringify({"event": "init", "data": {"room": spr.roomName }});
-              //console.log("Sending message " + message);
+              message = JSON.stringify({"event": "init", "data": {"room": spr.roomName, "page": spr.page }});
               spr.socket.send(message);
+              break;
+            case 'draw': 
+              spr.remoteDraw(spr, data);
+              break;
+            case 'draw-many':
+              spr.remoteDrawMany(spr, data);
+              break;
+            case 'clear':
+              spr.remoteClear(spr, data);
+              break;
+            case 'image':
+              spr.remoteImage(spr, data);
+              break;
           }
         }
     },
@@ -85,6 +89,12 @@ Ext.define('Whiteboard.Connection', {
         this.socket.send(m);
     },
 
+    getImage : function()
+    {
+        console.log("Getting image for page " + this.page);
+        m = JSON.stringify({"event":"get-image", "data": {"room": this.roomName, "page": this.page}})
+        this.socket.send(m);
+    },
     /***
      * All remote functions below
      */
@@ -144,5 +154,15 @@ Ext.define('Whiteboard.Connection', {
     remoteClear : function(self, data)
     {
         self.whiteboard.clear(false);
+    },
+
+    remoteImage : function(self, data)
+    {
+        if (data.url != "") {
+            var img = document.createElement('img');
+            img.src = data.url;
+            console.log("Image url is " + data.url);
+            self.whiteboard.loadImage(data.url, data.width, data.height);
+        }
     },
 });

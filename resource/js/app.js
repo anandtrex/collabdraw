@@ -65,14 +65,15 @@ Ext.application({
                         },
                         painted: function(){
                             keyValPairStr = document.URL.substring(document.URL.indexOf('#')+1).split(';');
-                            keyValPairs = {}
+                            keyValPairs = {};
                             for(var i = 0; i < keyValPairStr.length; i++){
                               pair = keyValPairStr[i].split('=');
                               keyValPairs[pair[0]] = pair[1];
                             }
                             
-                            if (typeof keyValPairs['room'] != 'undefined')
+                            if (typeof keyValPairs['room'] != 'undefined'){
                               room = keyValPairs['room'];
+                            }
                             whiteboard = Ext.create('Whiteboard.Svg', 1000, 550, uid, room);
                         },
                     }

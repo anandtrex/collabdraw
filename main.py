@@ -12,6 +12,8 @@ import tornado.ioloop
 import tornado.web
 import redis
 
+from pystacia import read
+
 LISTENERS = {}
 
 logger = logging.getLogger('websocket')
@@ -32,6 +34,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     room_name = ''
     paths = []
     redis_client = None
+    page_no = 1
 
     def open(self):
         logger.info("Open connection")
@@ -60,6 +63,12 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           self.room_name = data['room']
           self.join_room(self.room_name)
 
+          # First send the image if it exists
+          image_url, width, height = self.get_image_data(self.room_name, self.page_no)
+          m = json.dumps({'event': 'image', 'data': {'url': image_url, 'width': width, 'height': height}})
+          self.send_message(m)
+
+          # Then send the paths
           if not self.paths:
             key = "%s" % self.room_name
             p = self.redis_client.get(key)
@@ -69,7 +78,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
             else:
               logger.info("No data in database")
 
-        if event == "draw-click":
+        elif event == "draw-click":
           singlePath = data['singlePath']
           if not self.paths:
             logger.debug("None")
@@ -81,11 +90,19 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           key = "%s" % self.room_name
           self.redis_client.set(key, self.paths)
 
-        if event == "clear":
+        elif event == "clear":
           m = json.dumps({'event': 'clear'})
           self.broadcast_message(m)
           key = "%s" % self.room_name
           self.redis_client.delete(key)
+
+        elif event == "get-image":
+          if self.room_name != data['room'] or self.page_no != data['page']:
+            logger.warning("Room name %s and/or page no. %s doesn't match with current room name %s and/or page no. %s. Ignoring" % (data['room'],
+                              data['page'], self.room_name, self.page_no))
+          image_url, width, height = self.get_image_data(self.room_name, self.page_no)
+          m = json.dumps({'event': 'image', 'data': {'url': image_url, 'width': width, 'height': height}})
+          self.send_message(m)
 
     def on_close(self):
       self.leave_room(self.room_name)
@@ -116,6 +133,18 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     def join_room(self, room_name):
       logger.info("Joining room %s" % room_name)
       LISTENERS.setdefault(room_name, []).append(self)
+
+    def get_image_data(self, room_name, page_no):
+      image_url = "files/" + room_name + "/" + str(page_no) + "_image.png";
+      image_path = os.path.realpath(__file__).replace(__file__, '') + image_url
+      try:
+        image = read(image_path)
+      except IOError as e:
+        logger.error("Error %s while reading image at location %s" % (e,
+          image_path))
+        return '', -1, -1
+      width, height = image.size
+      return image_url, width, height
 
 settings = {
     'auto_reload': True,
