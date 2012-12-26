@@ -3,6 +3,7 @@ import json
 import os
 import threading
 import subprocess
+import glob
 from zlib import compress
 from urllib.parse import quote
 from base64 import b64encode
@@ -16,18 +17,22 @@ import redis
 from pystacia import read
 
 LISTENERS = {}
+LISTENER_THREADS = {}
+# LISTENERS = {"roomname":[]}
+# LISTENERS = {"roomname":{1:[], 2:[]}}
 
 logger = logging.getLogger('websocket')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
 
-def redis_listener(room_name):
+def redis_listener(room_name, page_no):
     logger.info("Starting listener thread for room %s" % room_name)
     rr = redis.Redis(host='localhost', db=2)
     r = rr.pubsub()
-    r.subscribe(room_name)
+    subscribe_key = "%s:%s" % (room_name, page_no)
+    r.subscribe(subscribe_key)
     for message in r.listen():
-      for listener in LISTENERS.get(room_name, []):
+      for listener in LISTENERS.get(room_name, {}).get(page_no, []):
         logger.debug("Sending message to room %s" % room_name)
         listener.send_message(message['data'])
 
@@ -36,6 +41,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     paths = []
     redis_client = None
     page_no = 1
+    num_pages = 1
 
     def open(self):
         logger.info("Open connection")
@@ -57,12 +63,17 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         if event == "init":
           logger.info("Initializing with room name %s" % self.room_name)
 
-          if data['room'] not in LISTENERS:
-            threading.Thread(target=redis_listener, args=(data['room'],)).start()
+          if data['room'] not in LISTENERS or data['page'] not in LISTENERS[data['room']]:
+            t = threading.Thread(target=redis_listener, args=(data['room'], data['page']))
+            t.start()
+            LISTENER_THREADS.setdefault(data['room'], {}).setdefault(data['page'], []).append(t)
 
           self.leave_room(self.room_name)
           self.room_name = data['room']
+          self.page_no = data['page']
           self.join_room(self.room_name)
+          self.num_pages = len(glob.glob('files/%s/*.png' % self.room_name))
+
 
           # First send the image if it exists
           image_url, width, height = self.get_image_data(self.room_name, self.page_no)
@@ -70,14 +81,13 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           self.send_message(m)
 
           # Then send the paths
-          if not self.paths:
-            key = "%s" % self.room_name
-            p = self.redis_client.get(key)
-            if p:
-              self.paths = json.loads(p.decode('utf-8').replace("'",'"'))
-              self.send_message(json.dumps({'event':'draw-many', 'data': {'datas':self.paths}}))
-            else:
-              logger.info("No data in database")
+          key = "%s:%s" % (self.room_name, self.page_no)
+          p = self.redis_client.get(key)
+          if p:
+            self.paths = json.loads(p.decode('utf-8').replace("'",'"'))
+            self.send_message(json.dumps({'event':'draw-many', 'data': {'datas':self.paths, 'npages': self.num_pages}}))
+          else:
+            logger.info("No data in database")
 
         elif event == "draw-click":
           singlePath = data['singlePath']
@@ -88,13 +98,13 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           self.paths.extend(singlePath)
           m = json.dumps({'event': 'draw', 'data': {'singlePath': singlePath}})
           self.broadcast_message(m)
-          key = "%s" % self.room_name
+          key = "%s:%s" % (self.room_name, self.page_no)
           self.redis_client.set(key, self.paths)
 
         elif event == "clear":
           m = json.dumps({'event': 'clear'})
           self.broadcast_message(m)
-          key = "%s" % self.room_name
+          key = "%s:%s" % (self.room_name, self.page_no)
           self.redis_client.delete(key)
 
         elif event == "get-image":
@@ -110,7 +120,8 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
 
     def broadcast_message(self, message):
       self.leave_room(self.room_name, False)
-      self.redis_client.publish(self.room_name, message)
+      publish_key = "%s:%s" % (self.room_name, self.page_no)
+      self.redis_client.publish(publish_key, message)
       self.join_room(self.room_name)
 
     def send_message(self, message):
@@ -126,14 +137,14 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
 
     def leave_room(self, room_name, clear_paths = True):
       logger.info("Leaving room %s" % room_name)
-      if self in LISTENERS.get(room_name, []):
-        LISTENERS[room_name].remove(self)
+      if self in LISTENERS.get(room_name, {}).get(self.page_no, []):
+        LISTENERS[room_name][self.page_no].remove(self)
       if clear_paths:
         self.paths = []
 
     def join_room(self, room_name):
       logger.info("Joining room %s" % room_name)
-      LISTENERS.setdefault(room_name, []).append(self)
+      LISTENERS.setdefault(room_name, {}).setdefault(self.page_no, []).append(self)
 
     def get_image_data(self, room_name, page_no):
       image_url = "files/" + room_name + "/" + str(page_no) + "_image.png";

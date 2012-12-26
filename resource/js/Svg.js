@@ -9,7 +9,7 @@ var nodejsAddress = 'ws://192.168.1.134:8888/realtime/';
 Ext.define('Whiteboard.Svg', {
     cvs : 'undefined',
     currentPage : 1,
-    totalPages : 2,
+    totalPages : 1,
     uid: "",
     room: "",
 

@@ -3,7 +3,7 @@ Ext.define('Whiteboard.Connection', {
     whiteboard : 'undefined',
     singlePath : [],
     currentPathLength : 0,
-    uid : 'undefined',
+    uid : 'uid',
     roomName : 'undefined',
     messageEvent : 'undefined',
     page : 1,
@@ -17,32 +17,43 @@ Ext.define('Whiteboard.Connection', {
         this.page = 1;
         console.log("Room is " + room);
 
-        spr = this;
+        _this = this;
         this.socket.onmessage = function(evt){
           message = JXG.decompress(evt.data);
-          //console.log("Received message "+ message);
           message = JSON.parse(message);
           evnt = message['event'];
           data = message['data'];
           switch(evnt){
             case 'ready':
-              message = JSON.stringify({"event": "init", "data": {"room": spr.roomName, "page": spr.page }});
-              spr.socket.send(message);
+              _this.init(_this.uid, _this.roomName, _this.page);
               break;
             case 'draw': 
-              spr.remoteDraw(spr, data);
+              _this.remoteDraw(_this, data);
               break;
             case 'draw-many':
-              spr.remoteDrawMany(spr, data);
+              _this.remoteDrawMany(_this, data);
               break;
             case 'clear':
-              spr.remoteClear(spr, data);
+              _this.remoteClear(_this, data);
               break;
             case 'image':
-              spr.remoteImage(spr, data);
+              _this.remoteImage(_this, data);
               break;
           }
         }
+    },
+
+    sendMessage: function(evt, data)
+    {
+      message = JSON.stringify({"event": evt, "data": data});
+      this.socket.send(message);
+    },
+
+    init: function(uid, room, currentPage)
+    {
+        console.log("Sending init for room " + room + " and page " + currentPage);
+        this.whiteboard.clear(false);
+        this.sendMessage("init", {"room": room, "page": currentPage });
     },
     
     /**
@@ -57,8 +68,7 @@ Ext.define('Whiteboard.Connection', {
         this.singlePath = [];
         this.currentPathLength = 0;
         this.roomName = roomName;
-        message = JSON.stringify({"event": "init", "data": {"room": this.roomName }});
-        this.socket.send(message);
+        this.sendMessage("init", {"room": this.roomName });
     },
     
     /**
@@ -69,12 +79,12 @@ Ext.define('Whiteboard.Connection', {
     {
         this.singlePath.push(data);
         this.currentPathLength++;
+        
         // Send path every two points or when user removes finger
         if (this.currentPathLength > 2 || data.type === "touchend") {
-            m = JSON.stringify({"event":"draw-click", "data": {"singlePath": this.singlePath}})
-            this.socket.send(m);
-            this.singlePath = [];
-            this.currentPathLength = 0;
+          this.sendMessage("draw-click", {"singlePath": this.singlePath});
+          this.singlePath = [];
+          this.currentPathLength = 0;
         }
     },
 
@@ -85,15 +95,13 @@ Ext.define('Whiteboard.Connection', {
     {
         this.singlePath = [];
         this.currentPathLength = 0;
-        m = JSON.stringify({"event":"clear"});
-        this.socket.send(m);
+        this.sendMessage("clear", {});
     },
 
     getImage : function()
     {
         console.log("Getting image for page " + this.page);
-        m = JSON.stringify({"event":"get-image", "data": {"room": this.roomName, "page": this.page}})
-        this.socket.send(m);
+        this.sendMessage("get-image", {"room": this.roomName, "page": this.page});
     },
     /***
      * All remote functions below
@@ -142,7 +150,8 @@ Ext.define('Whiteboard.Connection', {
             else if (ds[d].type == 'touchend')
                 self.whiteboard.endPath(ds[d].oldx, ds[d].oldy, ds[d].x, ds[d].y, ds[d].lineColor, ds[d].lineWidth, false);
         }
-        //self.whiteboard.setTotalPages(data.npages);
+        self.whiteboard.setTotalPages(data.npages);
+        console.log("Total pages set to " + data.npages);
     },
 
     /**
