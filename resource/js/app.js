@@ -1,6 +1,5 @@
 Ext.Loader.setConfig({enabled:true});
 Ext.Loader.setPath('Whiteboard','resource/js');
-//Ext.require('Whiteboard.Canvas');
 Ext.require('Whiteboard.Svg');
 Ext.require('Whiteboard.Connection');
 
@@ -21,19 +20,15 @@ Ext.application({
             xtype: 'panel',
             fullscreen : true,
             layout : 'vbox',
-            //centered: true,
             items : [
             {
                 xtype : 'panel',
                 cls: 'canvas-container',
-                //html : '<p>Canvas</p><div id="whiteboard"></div>',
                 flex: 3,
                 items: [{
                     xtype: 'panel',
                     centered: 'true',
                     style: 'background-color: #ffffff;',
-                    //id: 'whiteboard-container',
-                    //html: thisCanvas,
                     html: "<div id='whiteboard-container-0' class='whiteboard-container'></div>",
                     listeners: {
                         initialize: function(){
@@ -93,7 +88,6 @@ Ext.application({
                     cls: 'action-button',
                     listeners: {
                         tap: function(){
-                            //whiteboard.setEraser();
                             curves.color = '#ffffff';
                             curves.width = '10px';
                         }
@@ -225,7 +219,6 @@ Ext.application({
                                         listeners: {
                                             tap: function(){
                                                 whiteboard.clear(true);
-                                                //whiteboard.getImage();
                                             }
                                         }
                                     },
@@ -245,7 +238,6 @@ Ext.application({
                                                prompt : { maxlength : 180, autocapitalize : false },
                                                fn: function(buttonId, value) {
                                                    if(buttonId == "ok"){
-                                                       //console.log("Room name was "+value);
                                                        whiteboard.joinRoom(value);
                                                    }
                                                }

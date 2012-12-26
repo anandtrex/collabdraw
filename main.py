@@ -2,6 +2,7 @@ import logging
 import json
 import os
 import threading
+import subprocess
 from zlib import compress
 from urllib.parse import quote
 from base64 import b64encode
@@ -146,6 +147,45 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
       width, height = image.size
       return image_url, width, height
 
+def process_uploaded_file(file_path):
+  dir_path = '/'.join(file_path.split('/')[:-1])
+  logger.info("Processing file %s" % file_path)
+  subprocess.call(['pdfseparate', file_path, dir_path+'/%d_image.pdf'])
+  subprocess.call(['convert', dir_path+'/*.pdf', dir_path+'/%d_image.png'])
+  subprocess.call(['rm', dir_path+'/*image.pdf'])
+  logger.info("Finished processing file")
+
+
+class Upload(tornado.web.RequestHandler):
+  def post(self):
+    return_str = "<html><head><meta http-equiv='REFRESH'\
+          content='5;url=http://192.168.1.134:8888/upload.html#room=%s'></head><body>%s. Will redirect back to the upload page in 5\
+          seconds</body></html>"
+    room_name = self.get_argument('room', '')
+    if not room_name:
+      logger.error("Unknown room name. Ignoring upload")
+      response_str = "Room name not provided"
+      self.finish(return_str % (room_name, response_str))
+      return
+    logger.debug("Room name is %s" % room_name)
+    fileinfo = self.request.files['fileToUpload'][0]
+    fname = fileinfo['filename']
+    fext = os.path.splitext(fname)[1]
+    if fext.lower() != '.pdf':
+      logger.error("Extension is not pdf. It is %s" % fext)
+      response_str = "Only pdf files are allowed"
+      self.finish(return_str % (room_name, response_str))
+      return
+    dir_path = "files/"+room_name+"/"
+    os.makedirs(dir_path, exist_ok=True)
+    file_path = dir_path + fname
+    fh = open(file_path, 'wb')
+    fh.write(fileinfo['body'])
+    fh.close()
+    threading.Thread(target=process_uploaded_file, args=(file_path,)).start()
+    response_str = "Upload finished successfully"
+    self.finish(return_str % (room_name, response_str))
+
 settings = {
     'auto_reload': True,
     'gzip': True,
@@ -155,20 +195,10 @@ application = tornado.web.Application([
     (r'/realtime/', RealtimeHandler),
     (r'/resource/(.*)', tornado.web.StaticFileHandler,
       dict(path=os.path.join(os.path.dirname(__file__), "resource"))),
+    (r'/upload', Upload),
     (r'/(.*)', tornado.web.StaticFileHandler, dict(path=os.path.dirname(__file__))),
 ], **settings)
 
 http_server = tornado.httpserver.HTTPServer(application)
 http_server.listen(8888)
 tornado.ioloop.IOLoop.instance().start()
-
-
-'''
-socket.on('init', function(data)
-socket.on('get-image', function(data)
-socket.on('draw-click', function(input)
-socket.on('clear', function(data)
-socket.on('save-canvas', function(data)
-socket.on('getCanvasList', function(data)
-socket.on('video', function(data)
-'''

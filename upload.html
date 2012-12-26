@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Files</title>
+    <link rel="stylesheet" href="resource/css/upload.css" type="text/css">
+    <script type="text/javascript" src="resource/js/upload.js"></script>
+</head>
+<body onload="documentReady();">
+<form id="form1" enctype="multipart/form-data" method="post" action="/upload">
+  <div class="row">
+    <label for="fileToUpload">Select a File to Upload</label><br />
+    <input type="file" name="fileToUpload" id="fileToUpload" onchange="fileSelected();"/>  
+    <input type="hidden" name="room" id="roomName" />  
+  </div>
+  <div class="row">
+  <input type="submit" value="Upload" />
+  </div>
+  <div id="fileInfo">
+    <div id="fileName"></div>
+    <div id="fileSize"></div>
+    <div id="fileType"></div>
+  </div>
+  <div class="row"></div>
+  <div id="progressIndicator">
+    <div id="uploadResponse"></div>
+  </div>
+  <div><a href="index.php">Back to canvas</a></div>  
+  <div>
+      Works only in Chrome
+      <br />
+      Does NOT work on Safari on Mac OS X
+  </div>
+</form>
+</body>
+</html>
