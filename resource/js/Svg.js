@@ -182,4 +182,12 @@ Ext.define('Whiteboard.Svg', {
     {
         this.totalPages = pages;
     },
+
+    /**
+     * Ask server to make video of current whiteboard
+     */
+    makeVideo : function()
+    {
+        this.connection.makeVideo();
+    },
 });

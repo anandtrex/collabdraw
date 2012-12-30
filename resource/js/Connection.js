@@ -103,6 +103,14 @@ Ext.define('Whiteboard.Connection', {
         console.log("Getting image for page " + this.page);
         this.sendMessage("get-image", {"room": this.roomName, "page": this.page});
     },
+
+    /**
+     * Make video remotely
+     */
+    makeVideo : function()
+    {
+      this.sendMessage("video", {});
+    },
     /***
      * All remote functions below
      */
@@ -174,4 +182,5 @@ Ext.define('Whiteboard.Connection', {
             self.whiteboard.loadImage(data.url, data.width, data.height);
         }
     },
+
 });

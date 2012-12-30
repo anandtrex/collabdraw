@@ -136,7 +136,7 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              curves.color = 'blue';
+                                              curves.color = '#0000FF';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:blue');
                                           }
@@ -149,7 +149,7 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              curves.color = 'black';
+                                              curves.color = '#000000';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:black');
                                           }
@@ -162,7 +162,7 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              curves.color = 'red';
+                                              curves.color = '#FF0000';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:red');
                                               
@@ -176,7 +176,7 @@ Ext.application({
                                       cls: 'action-button',
                                       listeners: {
                                           tap: function() {
-                                              curves.color = 'green';
+                                              curves.color = '#FF0000';
                                               curves.width = '3px';
                                               Ext.getCmp('color-selector').setStyle('background:green');
                                           }
@@ -248,7 +248,6 @@ Ext.application({
                                     {
                                         xtype: 'button',
                                         text: 'Get Video...',
-                                        ui: 'plain',
                                         cls: 'action-button',
                                         height: 30,
                                         listeners: {
