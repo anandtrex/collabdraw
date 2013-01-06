@@ -1,2 +1,0 @@
-mongod
-node server.js
