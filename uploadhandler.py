@@ -6,11 +6,8 @@ import threading
 import tornado.web
 
 class UploadHandler(tornado.web.RequestHandler):
-  def __init__(self):
-    super(tornado.web.RequestHandler, self).__init__()
-    self.logger = logging.getLogger('websocket')
-
   def post(self):
+    self.logger = logging.getLogger('websocket')
     return_str = "<html><head><meta http-equiv='REFRESH'\
           content='5;url=http://192.168.1.134:8888/upload.html#room=%s'></head><body>%s. Will redirect back to the upload page in 5\
           seconds</body></html>"
