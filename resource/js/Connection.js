@@ -64,10 +64,11 @@ Ext.define('Whiteboard.Connection', {
      */
     joinRoom : function(roomName, page)
     {
-        this.whiteboard.clear(false);
+        this.whiteboard.clear(false, false);
         this.singlePath = [];
         this.currentPathLength = 0;
         this.roomName = roomName;
+        console.log("Sending init for room " + roomName);
         this.sendMessage("init", {"room": this.roomName });
     },
     
