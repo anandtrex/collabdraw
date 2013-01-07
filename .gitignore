@@ -3,3 +3,5 @@ eid_auth.php
 node_modules
 touch
 resource/touch
+venv
+*.pyc
