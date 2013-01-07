@@ -1,7 +1,7 @@
 Ext.require('Whiteboard.MessageEvent');
 
 
-var nodejsAddress = 'ws://192.168.1.134:8888/realtime/';
+var nodejsAddress = 'ws://'+appIpAddress+':'+appPort+'/realtime/';
 
 /**
  * This contains all the local functions to interact with the whiteboard. It also contains

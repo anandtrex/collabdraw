@@ -14,6 +14,7 @@ import redis
 from pystacia import read
 
 from tools import hexColorToRGB, createCairoContext
+import config
 
 class RealtimeHandler(tornado.websocket.WebSocketHandler):
     room_name = ''
@@ -28,7 +29,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
 
     def redis_listener(self, room_name, page_no):
         self.logger.info("Starting listener thread for room %s" % room_name)
-        rr = redis.Redis(host='localhost', db=2)
+        rr = redis.Redis(host=config.REDIS_IP_ADDRESS, db=2)
         r = rr.pubsub()
         r.subscribe(self.construct_paths_key(room_name, page_no))
         for message in r.listen():
@@ -40,7 +41,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         self.logger = logging.getLogger('websocket')
         self.logger.info("Open connection")
         self.send_message(self.construct_message("ready"))
-        self.redis_client = redis.Redis(host='localhost', db=2)
+        self.redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, db=2)
 
     def on_message(self, message):
         m = json.loads(message)

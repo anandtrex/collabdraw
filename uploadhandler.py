@@ -5,11 +5,13 @@ import threading
 
 import tornado.web
 
+import config
+
 class UploadHandler(tornado.web.RequestHandler):
   def post(self):
     self.logger = logging.getLogger('websocket')
     return_str = "<html><head><meta http-equiv='REFRESH'\
-          content='5;url=http://192.168.1.134:8888/upload.html#room=%s'></head><body>%s. Will redirect back to the upload page in 5\
+          content='5;url=http://"+config.APP_IP_ADDRESS+":"+config.APP_PORT+"/upload.html#room=%s'></head><body>%s. Will redirect back to the upload page in 5\
           seconds</body></html>"
     room_name = self.get_argument('room', '')
     if not room_name:

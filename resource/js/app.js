@@ -276,7 +276,7 @@ Ext.application({
                                         height: 30,
                                         listeners: {
                                             tap: function() {
-                                                window.open('http://192.168.1.134:8888/upload.html#room='+room, "Upload");
+                                                window.open('http://'+appIpAddress+':'+appPort+'/upload.html#room='+room, "Upload");
                                             }
                                         }
                                     },
