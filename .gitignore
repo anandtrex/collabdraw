@@ -5,3 +5,4 @@ touch
 resource/touch
 venv
 *.pyc
+*~

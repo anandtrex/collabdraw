@@ -1,0 +1,30 @@
+FFMPEG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/ffmpeg.tgz"
+FFMPEG_VENDOR="vendor/ffmpeg"
+
+# vendor ffmpeg
+mkdir -p $1/$FFMPEG_VENDOR
+curl $FFMPEG_BINARY -o - | tar -xz -C $1/$FFMPEG_VENDOR -f -
+
+
+IMAGEMAGICK_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/imagemagick.tgz"
+IMAGEMAGICK_VENDOR="vendor/imagemagick"
+
+# vendor imagemagick
+mkdir -p $1/$IMAGEMAGICK_VENDOR
+curl $IMAGEMAGICK_BINARY -o - | tar -xz -C $1/$IMAGEMAGICK_VENDOR -f -
+
+
+FONTCONFIG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/fontconfig.tgz"
+FONTCONFIG_VENDOR="vendor/fontconfig-2.10"
+
+# vendor fontconfig
+mkdir -p $1/$FONTCONFIG_VENDOR
+curl $FONTCONFIG_BINARY -o - | tar -xz -C $1/$FONTCONFIG_VENDOR -f -
+
+
+POPPLER_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/poppler.tgz"
+POPPLER_VENDOR="vendor/poppler"
+
+# vendor poppler
+mkdir -p $1/$POPPLER_VENDOR
+curl $POPPLER_BINARY -o - | tar -xz -C $1/$POPPLER_VENDOR -f -
