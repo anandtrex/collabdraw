@@ -1,5 +1,4 @@
 decorator==3.4.0
-pycairo==1.10.1
 pystacia==0.1
 redis==2.7.2
 six==1.2.0
