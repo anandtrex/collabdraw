@@ -29,8 +29,8 @@ POPPLER_VENDOR="vendor/poppler"
 mkdir -p $BUILD_DIR/$POPPLER_VENDOR
 curl $POPPLER_BINARY -o - | tar -xz -C $BUILD_DIR/$POPPLER_VENDOR -f -
 
-POPPLER_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/cairo.tgz"
-POPPLER_VENDOR="vendor/cairo"
+CAIRO_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/cairo.tgz"
+CAIRO_VENDOR="vendor/cairo"
 
 # vendor cairo
 mkdir -p $BUILD_DIR/$CAIRO_VENDOR
