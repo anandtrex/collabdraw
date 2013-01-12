@@ -1,3 +1,0 @@
----
-config_vars:
-  PATH: "vendor/ffmpeg/ffmpeg/bin:vendor/imagemagick/bin:vendor/poppler/bin:/usr/bin:/bin"
