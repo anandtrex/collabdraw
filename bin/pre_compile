@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 INSTALL_DIR=/app/.heroku/
+
 FFMPEG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/ffmpeg.tgz"
 FFMPEG_VENDOR="vendor/ffmpeg"
 
@@ -44,4 +45,10 @@ mkdir -p $INSTALL_DIR/$CAIRO_VENDOR
 echo "Downloading from $CAIRO_BINARY"
 curl $CAIRO_BINARY -o - | tar -xz -C $INSTALL_DIR/$CAIRO_VENDOR -f -
 
-export PKG_CONFIG_PATH=$INSTALL_DIR/$CAIRO_VENDOR/lib/pkgconfig
+PIXMAN_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/pixman.tgz"
+PIXMAN_VENDOR="vendor/pixman"
+
+# vendor pixman
+mkdir -p $INSTALL_DIR/$PIXMAN_VENDOR
+echo "Downloading from $PIXMAN_BINARY"
+curl $PIXMAN_BINARY -o - | tar -xz -C $INSTALL_DIR/$PIXMAN_VENDOR -f -
