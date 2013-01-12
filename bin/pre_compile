@@ -1,44 +1,48 @@
+#!/usr/bin/env bash
+
+INSTALL_DIR=/app/.heroku
+
 FFMPEG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/ffmpeg.tgz"
 FFMPEG_VENDOR="vendor/ffmpeg"
 
 # vendor ffmpeg
-mkdir -p $BUILD_DIR/$FFMPEG_VENDOR
+mkdir -p $INSTALL_DIR/$FFMPEG_VENDOR
 echo "Downloading from $FFMPEG_BINARY"
-curl $FFMPEG_BINARY -o - | tar -xz -C $BUILD_DIR/$FFMPEG_VENDOR -f -
+curl $FFMPEG_BINARY -o - | tar -xz -C $INSTALL_DIR/$FFMPEG_VENDOR -f -
 
 
 IMAGEMAGICK_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/imagemagick.tgz"
 IMAGEMAGICK_VENDOR="vendor/imagemagick"
 
 # vendor imagemagick
-mkdir -p $BUILD_DIR/$IMAGEMAGICK_VENDOR
+mkdir -p $INSTALL_DIR/$IMAGEMAGICK_VENDOR
 echo "Downloading from $IMAGEMAGICK_BINARY"
-curl $IMAGEMAGICK_BINARY -o - | tar -xz -C $BUILD_DIR/$IMAGEMAGICK_VENDOR -f -
+curl $IMAGEMAGICK_BINARY -o - | tar -xz -C $INSTALL_DIR/$IMAGEMAGICK_VENDOR -f -
 
 
 FONTCONFIG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/fontconfig.tgz"
 FONTCONFIG_VENDOR="vendor/fontconfig-2.10"
 
 # vendor fontconfig
-mkdir -p $BUILD_DIR/$FONTCONFIG_VENDOR
+mkdir -p $INSTALL_DIR/$FONTCONFIG_VENDOR
 echo "Downloading from $FONTCONFIG_BINARY"
-curl $FONTCONFIG_BINARY -o - | tar -xz -C $BUILD_DIR/$FONTCONFIG_VENDOR -f -
+curl $FONTCONFIG_BINARY -o - | tar -xz -C $INSTALL_DIR/$FONTCONFIG_VENDOR -f -
 
 
 POPPLER_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/poppler.tgz"
 POPPLER_VENDOR="vendor/poppler"
 
 # vendor poppler
-mkdir -p $BUILD_DIR/$POPPLER_VENDOR
+mkdir -p $INSTALL_DIR/$POPPLER_VENDOR
 echo "Downloading from $POPPLER_BINARY"
-curl $POPPLER_BINARY -o - | tar -xz -C $BUILD_DIR/$POPPLER_VENDOR -f -
+curl $POPPLER_BINARY -o - | tar -xz -C $INSTALL_DIR/$POPPLER_VENDOR -f -
 
 CAIRO_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/cairo.tgz"
 CAIRO_VENDOR="vendor/cairo"
 
 # vendor cairo
-mkdir -p $BUILD_DIR/$CAIRO_VENDOR
+mkdir -p $INSTALL_DIR/$CAIRO_VENDOR
 echo "Downloading from $CAIRO_BINARY"
-curl $CAIRO_BINARY -o - | tar -xz -C $BUILD_DIR/$CAIRO_VENDOR -f -
+curl $CAIRO_BINARY -o - | tar -xz -C $INSTALL_DIR/$CAIRO_VENDOR -f -
 
-export PKG_CONFIG_PATH=$BUILD_DIR/$CAIRO_VENDOR/lib/pkgconfig
+export PKG_CONFIG_PATH=$INSTALL_DIR/$CAIRO_VENDOR/lib/pkgconfig
