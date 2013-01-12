@@ -1,5 +1,4 @@
 import logging
-import os
 
 import tornado.httpserver
 import tornado.ioloop
@@ -16,7 +15,7 @@ logger.setLevel(logging.DEBUG)
 
 class IndexHandler(tornado.web.RequestHandler):
   def get(self):
-    loader = template.Loader(os.path.dirname(__file__))
+    loader = template.Loader(config.ROOT_DIR)
     return_str = loader.load("index.html").generate(app_ip_address=config.APP_IP_ADDRESS,
                                        app_port=config.APP_PORT)
     self.finish(return_str)
@@ -26,11 +25,11 @@ class Application(tornado.web.Application):
     handlers = [
       (r'/realtime/', RealtimeHandler),
       (r'/resource/(.*)', tornado.web.StaticFileHandler,
-        dict(path=os.path.join(os.path.dirname(__file__), "resource"))),
+        dict(path=config.RESOURCE_DIR)),
       (r'/upload', UploadHandler),
       (r'/index.html', IndexHandler),
       (r'/(.*)', tornado.web.StaticFileHandler,
-        dict(path=os.path.dirname(__file__))),
+        dict(path=config.ROOT_DIR)),
     ]
 
     self.LISTENERS = {}
