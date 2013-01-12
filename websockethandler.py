@@ -29,7 +29,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
 
     def redis_listener(self, room_name, page_no):
         self.logger.info("Starting listener thread for room %s" % room_name)
-        rr = redis.Redis(host=config.REDIS_IP_ADDRESS, db=2)
+        rr = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=1)
         r = rr.pubsub()
         r.subscribe(self.construct_paths_key(room_name, page_no))
         for message in r.listen():
