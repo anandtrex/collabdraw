@@ -44,5 +44,6 @@ class Application(tornado.web.Application):
 
 if __name__ == "__main__":
   http_server = tornado.httpserver.HTTPServer(Application())
+  logger.info("Listening on port %s" % config.APP_PORT)
   http_server.listen(config.APP_PORT)
   tornado.ioloop.IOLoop.instance().start()
