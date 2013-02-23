@@ -1,11 +1,13 @@
-Ext.define('Whiteboard.Connection', {
+enyo.kind({
+    name: 'Connection',
+    kind: null,
+    
     socket : 'undefined',
     whiteboard : 'undefined',
     singlePath : [],
     currentPathLength : 0,
     uid : 'uid',
-    roomName : 'undefined',
-    messageEvent : 'undefined',
+    room : 'undefined',
     page : 1,
 
     constructor : function(address, whiteboard, room)
@@ -13,7 +15,7 @@ Ext.define('Whiteboard.Connection', {
         this.whiteboard = whiteboard;
         console.log("Connecting to address " + address);
         this.socket = new WebSocket(address);
-        this.roomName = room;
+        this.room = room;
         this.page = 1;
         console.log("Room is " + room);
 
@@ -25,7 +27,7 @@ Ext.define('Whiteboard.Connection', {
           data = message['data'];
           switch(evnt){
             case 'ready':
-              _this.init(_this.uid, _this.roomName, _this.page);
+              _this.init(_this.uid, _this.room, _this.page);
               break;
             case 'draw': 
               _this.remoteDraw(_this, data);
@@ -59,17 +61,17 @@ Ext.define('Whiteboard.Connection', {
     /**
      * Get data from server to initialize this whiteboard
      * @param {Object} uid
-     * @param {Object} roomName
+     * @param {Object} room
      * @param {Object} page
      */
-    joinRoom : function(roomName, page)
+    joinRoom : function(room, page)
     {
         this.whiteboard.clear(false, false);
         this.singlePath = [];
         this.currentPathLength = 0;
-        this.roomName = roomName;
-        console.log("Sending init for room " + roomName);
-        this.sendMessage("init", {"room": this.roomName });
+        this.room = room;
+        console.log("Sending init for room " + room);
+        this.sendMessage("init", {"room": this.room });
     },
     
     /**
@@ -102,7 +104,7 @@ Ext.define('Whiteboard.Connection', {
     getImage : function()
     {
         console.log("Getting image for page " + this.page);
-        this.sendMessage("get-image", {"room": this.roomName, "page": this.page});
+        this.sendMessage("get-image", {"room": this.room, "page": this.page});
     },
 
     /**
@@ -159,6 +161,7 @@ Ext.define('Whiteboard.Connection', {
             else if (ds[d].type == 'touchend')
                 self.whiteboard.endPath(ds[d].oldx, ds[d].oldy, ds[d].x, ds[d].y, ds[d].lineColor, ds[d].lineWidth, false);
         }
+        console.log("Total pages is " + data.npages);
         self.whiteboard.setTotalPages(data.npages);
         console.log("Total pages set to " + data.npages);
     },

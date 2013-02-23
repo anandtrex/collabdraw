@@ -1,31 +1,26 @@
-Ext.require('Whiteboard.MessageEvent');
-
-
-var nodejsAddress = 'ws://'+appIpAddress+':'+appPort+'/realtime/';
-
 /**
  * This contains all the local functions to interact with the whiteboard. It also contains
  * interfaces to the Connection class.
  */
-Ext.define('Whiteboard.Svg', {
+enyo.kind({
+    name: 'WhiteboardSvg', 
+    kind: null,
+    
     cvs : 'undefined',
     currentPage : 1,
     totalPages : 1,
     uid: "",
     room: "",
-
-    /**
-     * Connection to server
-     */
     connection : 'undefined',
 
-    constructor : function(width, height, uid, room, page)
+    constructor : function(name, width, height, uid, room, page, websocketAddress)
     {
-        this.cvs = new Raphael('whiteboard-container-0', width, height);
-
-        this.connection = Ext.create('Whiteboard.Connection', nodejsAddress, this, room);
+        console.log("My name is " + name);
+        console.log("width is " + width + " and height is " + height);
         this.uid = uid;
         this.room = room;
+        this.cvs = new Raphael(name, width, height);
+        this.connection = new Connection(websocketAddress, this, room);
     },
 
     /**
@@ -149,7 +144,7 @@ Ext.define('Whiteboard.Svg', {
      */
     nextPage : function()
     {
-        
+        console.log("Current page is " + this.currentPage);
         if (this.currentPage + 1 > this.totalPages) {
             // Blank canvas
             console.log("Total pages was " + this.totalPages + " and current page is " + this.currentPage);
@@ -189,5 +184,10 @@ Ext.define('Whiteboard.Svg', {
     makeVideo : function()
     {
         this.connection.makeVideo();
+    },
+    
+    drawRectangle: function()
+    {
+        this.cvs.rect(10, 10, 50, 50);
     },
 });
