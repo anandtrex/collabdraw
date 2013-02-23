@@ -1,0 +1,3 @@
+[submodule "enyo"]
+	path = enyo
+	url = https://github.com/enyojs/enyo.git
