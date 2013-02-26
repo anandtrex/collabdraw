@@ -18,7 +18,7 @@ class IndexHandler(tornado.web.RequestHandler):
   def get(self):
     loader = template.Loader(config.ROOT_DIR)
     return_str = loader.load("index.html").generate(app_ip_address=config.APP_IP_ADDRESS,
-                                       app_port=str(config.WEBSOCKET_LISTEN_PORT))
+                                       app_port=config.PUBLIC_LISTEN_PORT)
     self.finish(return_str)
 
 class Application(tornado.web.Application):
