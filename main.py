@@ -4,6 +4,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.template as template
+from tornado.options import options
 
 from websockethandler import RealtimeHandler
 from uploadhandler import UploadHandler
@@ -28,6 +29,7 @@ class Application(tornado.web.Application):
         dict(path=config.RESOURCE_DIR)),
       (r'/upload', UploadHandler),
       (r'/index.html', IndexHandler),
+      (r'/', IndexHandler),
       (r'/(.*)', tornado.web.StaticFileHandler,
         dict(path=config.ROOT_DIR)),
     ]
