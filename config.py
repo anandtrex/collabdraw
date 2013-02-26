@@ -1,9 +1,18 @@
 import os
 
-APP_IP_ADDRESS = '192.168.1.134' #'collabdraw.heroku.com'
-APP_PORT = os.environ.get('PORT', 5000)
+# App's host and port
+APP_IP_ADDRESS = "collab.cloudapp.net"
+APP_PORT = os.environ.get('PORT', 6000)
 
-REDIS_IP_ADDRESS = 'localhost' #'pub-redis-15544.us-east-1-4.3.ec2.garantiadata.com'
-REDIS_PORT = 6379 #15544 
-ROOT_DIR = '.' #'/app'
+# Port in which websocket client should listen
+# Usually same ass APP_PORT unless some other
+# port forwarding is set up
+WEBSOCKET_LISTEN_PORT = APP_PORT
+
+# Redis host and port
+REDIS_IP_ADDRESS = 'localhost'
+REDIS_PORT = 6379
+
+# Full path of "collabdraw" directory
+ROOT_DIR = "/".join(os.path.realpath(__file__).split('/')[:-1])
 RESOURCE_DIR = ROOT_DIR + '/resource'
