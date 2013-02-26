@@ -11,7 +11,7 @@ class UploadHandler(tornado.web.RequestHandler):
   def post(self):
     self.logger = logging.getLogger('websocket')
     return_str = "<html><head><meta http-equiv='REFRESH'\
-          content='5;url=http://"+config.APP_IP_ADDRESS+":"+config.PUBLIC_LISTEN_PORT+"/upload.html#room=%s'></head><body>%s. Will redirect back to the upload page in 5\
+          content='5;url=http://"+config.APP_IP_ADDRESS+":"+str(config.PUBLIC_LISTEN_PORT)+"/upload.html#room=%s'></head><body>%s. Will redirect back to the upload page in 5\
           seconds</body></html>"
     room_name = self.get_argument('room', '')
     if not room_name:

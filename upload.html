@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Upload Files</title>
-    <link rel="stylesheet" href="resource/css/upload.css" type="text/css">
-    <script type="text/javascript" src="resource/js/upload.js"></script>
-</head>
-<body onload="documentReady();">
-<form id="form1" enctype="multipart/form-data" method="post" action="/upload">
-  <div class="row">
-    <label for="fileToUpload">Select a File to Upload</label><br />
-    <input type="file" name="fileToUpload" id="fileToUpload" onchange="fileSelected();"/>  
-    <input type="hidden" name="room" id="roomName" />  
-  </div>
-  <div class="row">
-  <input type="submit" value="Upload" />
-  </div>
-  <div id="fileInfo">
-    <div id="fileName"></div>
-    <div id="fileSize"></div>
-    <div id="fileType"></div>
-  </div>
-  <div class="row"></div>
-  <div id="progressIndicator">
-    <div id="uploadResponse"></div>
-  </div>
-  <div><a href="index.php">Back to canvas</a></div>  
-  <div>
-      Works only in Chrome
-      <br />
-      Does NOT work on Safari on Mac OS X
-  </div>
-</form>
-</body>
+    
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Collabdraw</title>
+        <link rel="shortcut icon" href="assets/favicon.ico" />
+        <!-- -->
+        <meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <script src="resource/enyo/enyo.js"></script>
+        <script src="resource/js/raphael-min.js" type="text/javascript"></script>
+        <script src="resource/js/jsxcompressor.js" type="text/javascript"></script>
+        <script src="resource/js/package.js" type="text/javascript"></script>
+    </head>
+    
+    <body class="enyo-unselectable">
+        <script>
+            var upload = new Upload();
+            upload.renderInto(document.body);
+        </script>
+    </body>
+
 </html>

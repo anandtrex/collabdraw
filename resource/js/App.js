@@ -287,7 +287,8 @@ enyo.kind(
     
     selectUpload: function(inSender, inEvent)
     {
-         window.open('http://' + this.appIpAddress + ':' + this.appPort + '/upload.html#room=' + this.room, "Upload");
+         //window.open('http://' + this.appIpAddress + ':' + this.appPort + '/upload.html#room=' + this.room, "Upload");
+         window.location = "./upload.html";
     },
     
     selectNext: function(inSender, inEvent)
