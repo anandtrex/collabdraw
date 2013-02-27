@@ -1,6 +1,0 @@
-_/ save snapshot
-- import image
-_/ individual rooms
-- audio recording with the canvas
-- draggable objects
-- collaborative mind mapping

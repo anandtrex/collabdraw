@@ -1,5 +1,0 @@
-More efficient storing paths in database (incrementally?)
-Robust disconnect notifications
-Locking while removing itself from list and sending
-Abstraction of DB and publish code
-Managing listener thread -- join when listeners empty?
