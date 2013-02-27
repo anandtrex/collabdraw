@@ -113,6 +113,10 @@ enyo.kind({
             content: "Next",
             ontap: "selectNext"
         }, {
+            kind: "onyx.Button",
+            content: "Logout",
+            ontap: "logout"
+        }, {
             name: "createJoinRoomPopup",
             kind: "onyx.Popup",
             centered: true,
@@ -242,7 +246,6 @@ enyo.kind({
     },
 
     selectUpload: function(inSender, inEvent) {
-        //window.open('http://' + this.appIpAddress + ':' + this.appPort + '/upload.html#room=' + this.room, "Upload");
         window.location = "./upload.html";
     },
 
@@ -264,5 +267,8 @@ enyo.kind({
             this.whiteboard.joinRoom(value);
         }
         this.$.createJoinRoomPopup.hide();
+    },
+    logout: function() {
+        window.location = "./logout.html";
     },
 });

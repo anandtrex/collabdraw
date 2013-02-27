@@ -1,6 +1,5 @@
 import logging
 import uuid
-#import os
 
 import tornado.httpserver
 import tornado.ioloop
@@ -10,6 +9,7 @@ import tornado.template as template
 from websockethandler import RealtimeHandler
 from uploadhandler import UploadHandler
 from loginhandler import LoginHandler
+from logouthandler import LogoutHandler
 from registerhandler import RegisterHandler
 import config
 
@@ -35,6 +35,7 @@ class Application(tornado.web.Application):
                     dict(path=config.RESOURCE_DIR)),
                 (r'/upload.html', UploadHandler),
                 (r'/login.html', LoginHandler),
+                (r'/logout.html', LogoutHandler),
                 (r'/register.html', RegisterHandler),
                 (r'/index.html', IndexHandler),
                 (r'/', IndexHandler),
