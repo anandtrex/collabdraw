@@ -1,27 +1,23 @@
+REQUIREMENTS:
+-------------
+1. Python 3.2+
+2. All python packages specified in requirements.txt (which might involve installing other
+non-python dependencies like cairo, redis)
+3. Redis server
+4. libpoppler, imagemagick for upload functionality
+5. ffmpeg to enable video functionality
+
+
 INSTALLATION:
-______________
-1. Install nodejs
-2. Install mongodb
-3. "npm install socket.io"
-4. "npm install mongodb"
-5. Install ffmpeg to enable conversion to video feature
-6. "npm install canvas" to enable conversion to video feature
-    This might require installation of various dev libraries including jpeg, png and gif libraries, cairo, and the standard build tools (gcc). The libraries that are missing will be shown in error messages while trying to install this.
-7. "npm install delivery" to install the library for enabling uploads
-8. Download Sencha Touch libraries (from http://www.sencha.com/products/touch/download/). Untar and rename the folder to "touch" and copy it into the root directory
-    
+-------------
+1. Clone the git repository
+2. Set the hostnames, ports and other options in config.py
     
 RUNNING:
------------
-1. Run the mongodb database using "mongod"
-2. Run the nodejs server using "node server.js"
-    Where server.js is in the root directory of the project
-3. Put the entire project in the htdocs/public_html folder of any server that can serve php (apache, nginx, etc.)
-4. Open "http://apache-server-address:port/canvas-draw/index.php" in Safari on iPad or Safari on Mac OS X / Windows.
-
+-------------
+1. Run the redis server
+2. Run "python main.py"
 
 KNOWN-ISSUES:
----------------
+-------------
 1. Doesn't work very well on android browsers (except Chrome on ICS) due to limited html5 support
-2. Upload and Save as Video functionality not fully integrated yet
-3. Login not enabled by default
