@@ -111,6 +111,28 @@ enyo.kind({
             this.$.registerResult.show();
             return;
         }
+        var ajax = new enyo.Ajax({
+            method: "POST",
+            postBody: {
+                url: "./register.html",
+            },
+            contentType: "application/json",
+        });
+        ajax.go({
+            loginId: loginid,
+            loginPassword: password,
+        });
+        ajax.response(this, "handleLoginResponse");
         console.log("User id and password are: " + loginid + ", " + password);
+    },
+
+    handleLoginResponse: function(inSender, inResponse) {
+        console.log(JSON.stringify(inResponse));
+        if (inResponse.result == "success") {
+            window.location = "./index.html";
+        }
+        else {
+            this.$.loginStatus.setContent("<span style='color:red'>Error occurred. Try again.</span>")
+        }
     },
 });

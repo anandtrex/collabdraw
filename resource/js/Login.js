@@ -109,20 +109,22 @@ enyo.kind({
             contentType: "application/json",
         });
         ajax.go({
-            username: loginid,
+            loginId: loginid,
+            loginPassword: password,
         });
         ajax.response(this, "handleLoginResponse");
-        ajax.response(this, "handleLoginError");
     },
 
     handleLoginResponse: function(inSender, inResponse) {
+        console.log("Response");
         console.log(JSON.stringify(inResponse));
         if (inResponse.result == "success") {
             window.location = "./index.html";
+        } else if (inResponse.result == "failure") {
+            this.$.loginStatus.setContent("<span style='color:red'>Wrong username/password</span>");
+        } else {
+            this.$.loginStatus.setContent("<span style='color:red'>Error occurred. Try again.</span>");
         }
-    },
-
-    handleLoginError: function(inSender, inResponse) {
-        console.log(JSON.stringify(inResponse));
+        this.$.loginResult.show();
     },
 });

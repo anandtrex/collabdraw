@@ -1,5 +1,6 @@
 import logging
 import uuid
+#import os
 
 import tornado.httpserver
 import tornado.ioloop
@@ -18,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 
 class IndexHandler(tornado.web.RequestHandler):
     def get_current_user(self):
-        return self.get_secure_cookie("user")
+        return self.get_secure_cookie("loginId")
 
     @tornado.web.authenticated
     def get(self):
@@ -55,6 +56,10 @@ class Application(tornado.web.Application):
 
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(Application())
+    #ssl_options={
+    #        "certfile": os.path.join(os.getcwd(), "server.crt"),
+    #        "keyfile": os.path.join(os.getcwd(),"server.key"),
+    #    }
     logger.info("Listening on port %s" % config.APP_PORT)
     http_server.listen(config.APP_PORT)
     tornado.ioloop.IOLoop.instance().start()
