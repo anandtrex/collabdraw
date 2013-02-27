@@ -31,7 +31,7 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h2>REQUIREMENTS:</h2>
+        <h2>SERVER REQUIREMENTS:</h2>
 
 <ol>
 <li>Python 3.2+</li>
@@ -43,7 +43,17 @@ non-python dependencies like cairo, redis)</li>
 </ol><h2>INSTALLATION:</h2>
 
 <ol>
-<li>Clone the git repository</li>
+<li>Clone the git repository 
+<code>
+git clone git://github.com/anandtrex/collabdraw.git
+</code>
+</li>
+<li>Initialize submodules
+<code>
+git submodule init &amp;&amp;
+git submodule update
+</code>
+</li>
 <li>Set the hostnames, ports and other options in config.py</li>
 </ol><h2>RUNNING:</h2>
 
@@ -53,7 +63,7 @@ non-python dependencies like cairo, redis)</li>
 </ol><h2>KNOWN-ISSUES:</h2>
 
 <ol>
-<li>Doesn't work very well on android browsers (except Chrome on ICS) due to limited html5 support</li>
+<li>Doesn't work very well on android gingerbread browsers due to limited html5 support</li>
 </ol>
       </section>
     </div>
@@ -66,7 +76,17 @@ non-python dependencies like cairo, redis)</li>
       </footer>
     </div>
 
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-38877511-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
 
   </body>
 </html>
