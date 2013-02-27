@@ -4,6 +4,7 @@ import tornado.web
 import redis
 
 import config
+from tools import hash_password
 
 class LoginHandler(tornado.web.RequestHandler):
   def get(self):
@@ -17,7 +18,7 @@ class LoginHandler(tornado.web.RequestHandler):
       redis_key = "users:%s" % login_id
       db_password = self.redis_client.get(redis_key)
       db_password = db_password.decode('utf-8')
-      if db_password != login_password:
+      if db_password != hash_password(login_password):
         self.logger.debug("db_password was %s but login_password was %s" % (db_password,
             login_password))
         self.finish('{"result": "failure"}')

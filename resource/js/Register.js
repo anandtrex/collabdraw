@@ -74,8 +74,7 @@ enyo.kind({
                         content: "Back",
                         ontap: "goToApp"
                     }, ],
-                },
-                {
+                }, {
                     kind: "FittableRows",
                     showing: false,
                     name: "registerResult",
@@ -85,8 +84,7 @@ enyo.kind({
                         allowHtml: true,
                         content: "",
                     }, ],
-                },
-                ],
+                }, ],
             }, ],
         }, ],
     }, {
@@ -102,11 +100,11 @@ enyo.kind({
         window.location = "./index.html";
     },
 
-    register : function() {
+    register: function() {
         var loginid = this.$.loginId.getValue();
         var password = this.$.loginPassword.getValue();
         var repeatPassword = this.$.loginPasswordRepeat.getValue();
-        if(password != repeatPassword){
+        if (password != repeatPassword) {
             this.$.registerStatus.setContent("<span style='color:red'>Passwords don't match</span>");
             this.$.registerResult.show();
             return;
@@ -130,9 +128,11 @@ enyo.kind({
         console.log(JSON.stringify(inResponse));
         if (inResponse.result == "success") {
             window.location = "./index.html";
+        } else if (inResponse.result == "conflict") {
+            this.$.registerStatus.setContent("<span style='color:red'>Login ID already exists</span>");
+        } else {
+            this.$.registerStatus.setContent("<span style='color:red'>Error occurred. Try again.</span>");
         }
-        else {
-            this.$.loginStatus.setContent("<span style='color:red'>Error occurred. Try again.</span>")
-        }
+        this.$.registerResult.show();
     },
 });
