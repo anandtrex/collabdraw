@@ -4,17 +4,8 @@ enyo.kind({
     fit: true,
 
     published: {
-        whiteboard: '',
-        curves: {
-            color: 'black',
-            width: '3px',
-        },
         uid: 'test',
         room: 'one',
-        canvasWidth: 1000,
-        canvasHeight: 550,
-        appIpAddress: "",
-        appPort: "",
     },
 
     components: [{

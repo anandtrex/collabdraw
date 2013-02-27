@@ -8,6 +8,9 @@ import tornado.web
 import config
 
 class UploadHandler(tornado.web.RequestHandler):
+  def get(self):
+      self.render("upload.html")
+
   def post(self):
     self.logger = logging.getLogger('websocket')
     return_str = "<html><head><meta http-equiv='REFRESH'\
