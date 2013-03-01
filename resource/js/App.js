@@ -31,24 +31,18 @@ enyo.kind({
                 this.applyStyle("width", this.owner.canvasWidth + "px");
                 this.applyStyle("height", this.owner.canvasHeight + "px");
                 if (window.location.protocol == 'https:') {
-                    console.log("Secure connection");
+                    //console.log("Secure connection");
                     var websocketAddress = 'wss://' + this.owner.appIpAddress + ':' + this.owner.appPort + '/realtime/';
                 } else {
-                    console.log("Normal connectin");
+                    //console.log("Normal connectin");
                     var websocketAddress = 'ws://' + this.owner.appIpAddress + ':' + this.owner.appPort + '/realtime/';
                 }
                 if (this.hasNode()) {
                     var _this = this;
-                    this.owner.whiteboard = new WhiteboardSvg(this.node.getAttribute("id"),
-                                                              this.owner.canvasWidth,
-                                                              this.owner.canvasHeight,
-                                                              this.owner.uid,
-                                                              this.owner.room,
-                                                              1, websocketAddress,
-                                                              function(numPages, currentPage) {
-                                                                    _this.owner.$.numPages.setContent(numPages);
-                                                                    _this.owner.$.currentPage.setContent(currentPage);
-                                                               });
+                    this.owner.whiteboard = new WhiteboardSvg(this.node.getAttribute("id"), this.owner.canvasWidth, this.owner.canvasHeight, this.owner.uid, this.owner.room, 1, websocketAddress, function(numPages, currentPage) {
+                        _this.owner.$.currentPage.setMax(numPages);
+                        _this.owner.$.currentPage.setValue(currentPage);
+                    });
                 }
             },
         }],
@@ -132,16 +126,14 @@ enyo.kind({
             content: "Logout",
             ontap: "logout"
         }, {
-            content: "10",
-            name: "numPages",
-            style: "float: right",
-        }, {
-            content: "/",
-            style: "float: right",
-        }, {
-            content: "0",
-            name: "currentPage",
-            style: "float: right",
+            kind: "onyx.PickerDecorator",
+            style: "float: right;",
+            components: [{}, {
+                kind: "onyx.IntegerPicker",
+                name: "currentPage",
+                onSelect: "gotoPage",
+                min: 1,
+            }, ],
         }, {
             name: "createJoinRoomPopup",
             kind: "onyx.Popup",
@@ -306,8 +298,12 @@ enyo.kind({
     },
 
     updatePageInfo: function() {
-        console.log("Updating");
-        this.$.numPages.setContent(this.whiteboard.getNumPages());
-        this.$.currentPage.setContent(this.whiteboard.getCurrentPage());
+        this.$.currentPage.setMax(this.whiteboard.getNumPages());
+        this.$.currentPage.setValue(this.whiteboard.getCurrentPage());
     },
+
+    gotoPage: function(inSender, inEvent){
+        this.whiteboard.gotoPage(inEvent.selected.content);
+    },
+
 });

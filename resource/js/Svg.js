@@ -23,8 +23,8 @@ enyo.kind({
     },
 
     constructor: function(name, width, height, uid, room, page, websocketAddress, callback) {
-        console.log("My name is " + name);
-        console.log("width is " + width + " and height is " + height);
+        //console.log("My name is " + name);
+        //console.log("width is " + width + " and height is " + height);
         this.uid = uid;
         this.room = room;
         this.cvs = new Raphael(name, width, height);
@@ -120,7 +120,7 @@ enyo.kind({
      * @param {Object} url
      */
     loadImage: function(url, width, height) {
-        console.log("Loading image from " + url);
+        //console.log("Loading image from " + url);
         this.cvs.image(url, 5, 5, width, height);
     },
 
@@ -128,7 +128,7 @@ enyo.kind({
         images = document.getElementsByTagName("image");
         // TODO More specific targetting of image
         if (images.length != 0) {
-            console.log("Images already loaded");
+            //console.log("Images already loaded");
             for (var i = 0; i < images.length; i++) {
                 images[i].parentNode.removeChild(images[i]);
             }
@@ -140,10 +140,10 @@ enyo.kind({
      * Go to the next page
      */
     nextPage: function() {
-        console.log("Current page is " + this.currentPage);
+        //console.log("Current page is " + this.currentPage);
         if (this.currentPage + 1 > this.totalPages) {
             // Blank canvas
-            console.log("Total pages was " + this.totalPages + " and current page is " + this.currentPage);
+            //console.log("Total pages was " + this.totalPages + " and current page is " + this.currentPage);
         } else {
             this.currentPage += 1;
             this.connection.init(this.uid, this.room, this.currentPage);
@@ -161,6 +161,11 @@ enyo.kind({
             this.currentPage -= 1;
             this.connection.init(this.uid, this.room, this.currentPage);
         }
+    },
+
+    gotoPage: function(pageNum) {
+        this.connection.init(this.uid, this.room, pageNum);
+        this.currentPage = pageNum;
     },
 
     newPage: function() {

@@ -12,11 +12,11 @@ enyo.kind({
 
     constructor: function(address, whiteboard, room) {
         this.whiteboard = whiteboard;
-        console.log("Connecting to address " + address);
+        //console.log("Connecting to address " + address);
         this.socket = new WebSocket(address);
         this.room = room;
         this.page = 1;
-        console.log("Room is " + room);
+        //console.log("Room is " + room);
 
         _this = this;
         this.socket.onmessage = function(evt) {
@@ -53,7 +53,7 @@ enyo.kind({
     },
 
     init: function(uid, room, currentPage) {
-        console.log("Sending init for room " + room + " and page " + currentPage);
+        //console.log("Sending init for room " + room + " and page " + currentPage);
         this.whiteboard.clear(false, false);
         this.sendMessage("init", {
             "room": room,
@@ -72,7 +72,7 @@ enyo.kind({
         this.singlePath = [];
         this.currentPathLength = 0;
         this.room = room;
-        console.log("Sending init for room " + room);
+        //console.log("Sending init for room " + room);
         this.sendMessage("init", {
             "room": this.room
         });
@@ -106,7 +106,7 @@ enyo.kind({
     },
 
     getImage: function() {
-        console.log("Getting image for page " + this.page);
+        //console.log("Getting image for page " + this.page);
         this.sendMessage("get-image", {
             "room": this.room,
             "page": this.page
@@ -165,7 +165,7 @@ enyo.kind({
             else if (ds[d].type == 'touchmove') self.whiteboard.continuePath(ds[d].oldx, ds[d].oldy, ds[d].x, ds[d].y, ds[d].lineColor, ds[d].lineWidth, false);
             else if (ds[d].type == 'touchend') self.whiteboard.endPath(ds[d].oldx, ds[d].oldy, ds[d].x, ds[d].y, ds[d].lineColor, ds[d].lineWidth, false);
         }
-        console.log("Total pages is " + data.npages);
+        //console.log("Total pages is " + data.npages);
         self.whiteboard.setTotalPages(data.npages);
     },
 
@@ -183,7 +183,7 @@ enyo.kind({
         if (data.url != "") {
             var img = document.createElement('img');
             img.src = data.url;
-            console.log("Image url is " + data.url);
+            //console.log("Image url is " + data.url);
             self.whiteboard.loadImage(data.url, data.width, data.height);
         }
     },
