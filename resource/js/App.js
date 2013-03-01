@@ -38,12 +38,22 @@ enyo.kind({
                     var websocketAddress = 'ws://' + this.owner.appIpAddress + ':' + this.owner.appPort + '/realtime/';
                 }
                 if (this.hasNode()) {
-                    this.owner.whiteboard = new WhiteboardSvg(this.node.getAttribute("id"), this.owner.canvasWidth, this.owner.canvasHeight, this.owner.uid, this.owner.room, 1, websocketAddress);
+                    var _this = this;
+                    this.owner.whiteboard = new WhiteboardSvg(this.node.getAttribute("id"),
+                                                              this.owner.canvasWidth,
+                                                              this.owner.canvasHeight,
+                                                              this.owner.uid,
+                                                              this.owner.room,
+                                                              1, websocketAddress,
+                                                              function(numPages, currentPage) {
+                                                                    _this.owner.$.numPages.setContent(numPages);
+                                                                    _this.owner.$.currentPage.setContent(currentPage);
+                                                               });
                 }
             },
         }],
     }, {
-        kind: "onyx.Toolbar",
+        kind: "onyx.MoreToolbar",
         components: [{
             kind: "onyx.Button",
             content: "Eraser",
@@ -110,12 +120,28 @@ enyo.kind({
             ontap: "selectPrevious"
         }, {
             kind: "onyx.Button",
+            content: "New Page",
+            ontap: "selectNewPage"
+        }, {
+            kind: "onyx.Button",
             content: "Next",
             ontap: "selectNext"
         }, {
             kind: "onyx.Button",
+            style: "float: right",
             content: "Logout",
             ontap: "logout"
+        }, {
+            content: "10",
+            name: "numPages",
+            style: "float: right",
+        }, {
+            content: "/",
+            style: "float: right",
+        }, {
+            content: "0",
+            name: "currentPage",
+            style: "float: right",
         }, {
             name: "createJoinRoomPopup",
             kind: "onyx.Popup",
@@ -251,10 +277,12 @@ enyo.kind({
 
     selectNext: function(inSender, inEvent) {
         this.whiteboard.nextPage();
+        this.updatePageInfo();
     },
 
     selectPrevious: function(inSender, inEvent) {
         this.whiteboard.prevPage();
+        this.updatePageInfo();
     },
 
     selectCreateJoinRoomPopupCancel: function(inSender, inEvent) {
@@ -270,5 +298,16 @@ enyo.kind({
     },
     logout: function() {
         window.location = "./logout.html";
+    },
+
+    selectNewPage: function(inSender, inEvent) {
+        this.whiteboard.newPage();
+        this.updatePageInfo();
+    },
+
+    updatePageInfo: function() {
+        console.log("Updating");
+        this.$.numPages.setContent(this.whiteboard.getNumPages());
+        this.$.currentPage.setContent(this.whiteboard.getCurrentPage());
     },
 });

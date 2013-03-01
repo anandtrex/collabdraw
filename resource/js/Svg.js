@@ -3,48 +3,54 @@
  * interfaces to the Connection class.
  */
 enyo.kind({
-    name: 'WhiteboardSvg', 
+    name: 'WhiteboardSvg',
     kind: null,
-    
-    cvs : 'undefined',
-    currentPage : 1,
-    totalPages : 1,
+
+    cvs: 'undefined',
+    currentPage: 1,
+    totalPages: -1,
     uid: "",
     room: "",
-    connection : 'undefined',
+    connection: 'undefined',
+    callback: 'undefined',
 
-    constructor : function(name, width, height, uid, room, page, websocketAddress)
-    {
+    getNumPages: function() {
+        return this.totalPages;
+    },
+
+    getCurrentPage: function() {
+        return this.currentPage;
+    },
+
+    constructor: function(name, width, height, uid, room, page, websocketAddress, callback) {
         console.log("My name is " + name);
         console.log("width is " + width + " and height is " + height);
         this.uid = uid;
         this.room = room;
         this.cvs = new Raphael(name, width, height);
         this.connection = new Connection(websocketAddress, this, room);
+        this.callback = callback;
     },
 
     /**
      * Join specified room
      * @param {Object} room
      */
-    joinRoom : function(room)
-    {
+    joinRoom: function(room) {
         this.connection.joinRoom(room);
     },
 
     /**
      * Ask server to make video of current whiteboard
      */
-    makeVideo : function()
-    {
+    makeVideo: function() {
         this.connection.makeVideo();
     },
 
     /**
      * Getter for cvs
      */
-    getCanvas : function()
-    {
+    getCanvas: function() {
         return this.cvs;
     },
 
@@ -54,15 +60,14 @@ enyo.kind({
      * @param {Object} y
      * @param {Object} send
      */
-    startPath : function(x, y, lc, lw, send)
-    {
+    startPath: function(x, y, lc, lw, send) {
         if (send) {
             this.connection.sendPath({
-                oldx : x,
-                oldy : y,
-                type : 'touchstart',
-                lineColor : lc,
-                lineWidth : lw,
+                oldx: x,
+                oldy: y,
+                type: 'touchstart',
+                lineColor: lc,
+                lineWidth: lw,
             });
         }
     },
@@ -70,21 +75,18 @@ enyo.kind({
     /**
      * Called when user continues path (without lifting finger)
      */
-    continuePath : function(oldx, oldy, x, y, lc, lw, send)
-    {
+    continuePath: function(oldx, oldy, x, y, lc, lw, send) {
         this.drawAndSendPath('touchmove', oldx, oldy, x, y, lc, lw, send)
     },
 
     /**
      * Called when user lifts finger
      */
-    endPath : function(oldx, oldy, x, y, lc, lw, send)
-    {
+    endPath: function(oldx, oldy, x, y, lc, lw, send) {
         this.drawAndSendPath('touchend', oldx, oldy, x, y, lc, lw, send)
     },
 
-    drawAndSendPath: function(type, oldx, oldy, x, y, lc, lw, send)
-    {
+    drawAndSendPath: function(type, oldx, oldy, x, y, lc, lw, send) {
         path = "M " + oldx + " " + oldy + " L " + x + " " + y + " Z";
         var p = this.cvs.path(path);
         p.attr("stroke", lc);
@@ -93,11 +95,11 @@ enyo.kind({
             this.connection.sendPath({
                 oldx: oldx,
                 oldy: oldy,
-                x : x,
-                y : y,
-                type : type,
-                lineColor : lc,
-                lineWidth : lw,
+                x: x,
+                y: y,
+                type: type,
+                lineColor: lc,
+                lineWidth: lw,
             });
         }
     },
@@ -106,34 +108,29 @@ enyo.kind({
      * Clear canvas
      * @param {Object} send
      */
-    clear : function(send, reloadImage)
-    {
+    clear: function(send, reloadImage) {
         reloadImage = typeof reloadImage == 'undefined' ? true : reloadImage;
         this.cvs.clear();
-        if (reloadImage)
-          this.connection.getImage();
-        if (send)
-            this.connection.sendClear();
+        if (reloadImage) this.connection.getImage();
+        if (send) this.connection.sendClear();
     },
 
     /**
      * Load an image onto the canvas
      * @param {Object} url
      */
-    loadImage : function(url, width, height)
-    {
+    loadImage: function(url, width, height) {
         console.log("Loading image from " + url);
         this.cvs.image(url, 5, 5, width, height);
     },
 
-    getImage : function()
-    {
+    getImage: function() {
         images = document.getElementsByTagName("image");
         // TODO More specific targetting of image
-        if(images.length != 0){
+        if (images.length != 0) {
             console.log("Images already loaded");
-            for (var i = 0; i < images.length; i++){
-              images[i].parentNode.removeChild(images[i]);
+            for (var i = 0; i < images.length; i++) {
+                images[i].parentNode.removeChild(images[i]);
             }
         }
         this.connection.getImage(this.currentPage);
@@ -142,8 +139,7 @@ enyo.kind({
     /**
      * Go to the next page
      */
-    nextPage : function()
-    {
+    nextPage: function() {
         console.log("Current page is " + this.currentPage);
         if (this.currentPage + 1 > this.totalPages) {
             // Blank canvas
@@ -157,8 +153,7 @@ enyo.kind({
     /**
      * Go to the previous page
      */
-    prevPage : function()
-    {
+    prevPage: function() {
 
         if (this.currentPage - 1 <= 0) {
             // do nothing
@@ -168,26 +163,29 @@ enyo.kind({
         }
     },
 
-    getColor : function()
-    {
+    newPage: function() {
+        this.currentPage = this.totalPages + 1;
+        this.totalPages += 1;
+        this.connection.newPage(this.uid, this.room, this.currentPage);
+    },
+
+    getColor: function() {
         return this.color;
     },
-    
-    setTotalPages: function(pages)
-    {
+
+    setTotalPages: function(pages) {
         this.totalPages = pages;
+        this.callback(this.totalPages, this.currentPage);
     },
 
     /**
      * Ask server to make video of current whiteboard
      */
-    makeVideo : function()
-    {
+    makeVideo: function() {
         this.connection.makeVideo();
     },
-    
-    drawRectangle: function()
-    {
+
+    drawRectangle: function() {
         this.cvs.rect(10, 10, 50, 50);
     },
 });
