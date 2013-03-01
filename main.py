@@ -19,7 +19,10 @@ logger.setLevel(logging.DEBUG)
 
 class IndexHandler(tornado.web.RequestHandler):
     def get_current_user(self):
-        return self.get_secure_cookie("loginId")
+        if not config.DEMO_MODE:
+            return self.get_secure_cookie("loginId")
+        else:
+            return True
 
     @tornado.web.authenticated
     def get(self):

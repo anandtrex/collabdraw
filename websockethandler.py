@@ -24,15 +24,19 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     page_no = 1
     num_pages = 1
 
-    def construct_paths_key(self, room_name, page_no):
-        publish_key = "%s:%s" % (room_name, page_no)
+    def construct_key(self, namespace, key, *keys):
+        publish_key = ""
+        if len(keys) == 0:
+            publish_key = "%s:%s" % (namespace, key)
+        else:
+            publish_key = "%s:%s:%s" % (namespace, key, ":".join(keys))
         return publish_key
 
     def redis_listener(self, room_name, page_no):
         self.logger.info("Starting listener thread for room %s" % room_name)
         rr = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=1)
         r = rr.pubsub()
-        r.subscribe(self.construct_paths_key(room_name, page_no))
+        r.subscribe(self.construct_key(room_name, page_no))
         for message in r.listen():
           for listener in self.application.LISTENERS.get(room_name, {}).get(page_no, []):
             self.logger.debug("Sending message to room %s" % room_name)
@@ -74,6 +78,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
           self.page_no = page_no
           self.join_room(self.room_name)
           self.num_pages = len(glob.glob('files/%s/*.png' % self.room_name))
+          #self.num_pages = self.redis_client.get(self.construct_key("info", self.room_name))
 
 
           # First send the image if it exists
@@ -82,7 +87,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
                                                              'width': width, 'height': height}))
 
           # Then send the paths
-          p = self.redis_client.get(self.construct_paths_key(self.room_name, self.page_no))
+          p = self.redis_client.get(self.construct_key(self.room_name, self.page_no))
           if p:
             self.paths = json.loads(p.decode('utf-8').replace("'",'"'))
             self.send_message(self.construct_message("draw-many",
@@ -98,11 +103,11 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
             
           self.paths.extend(singlePath)
           self.broadcast_message(self.construct_message("draw", {'singlePath': singlePath}))
-          self.redis_client.set(self.construct_paths_key(self.room_name, self.page_no), self.paths)
+          self.redis_client.set(self.construct_key(self.room_name, self.page_no), self.paths)
 
         elif event == "clear":
           self.broadcast_message(self.construct_message("clear"))
-          self.redis_client.delete(self.construct_paths_key(self.room_name, self.page_no))
+          self.redis_client.delete(self.construct_key(self.room_name, self.page_no))
 
         elif event == "get-image":
           if self.room_name != data['room'] or self.page_no != data['page']:
@@ -125,7 +130,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
 
     def broadcast_message(self, message):
       self.leave_room(self.room_name, False)
-      self.redis_client.publish(self.construct_paths_key(self.room_name, self.page_no), message)
+      self.redis_client.publish(self.construct_key(self.room_name, self.page_no), message)
       self.join_room(self.room_name)
 
     def send_message(self, message):
@@ -163,7 +168,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
       return image_url, width, height
 
     def make_video(self, room_name, page_no):
-      p = self.redis_client.get(self.construct_paths_key(room_name, page_no))
+      p = self.redis_client.get(self.construct_key(room_name, page_no))
       os.makedirs('tmp', exist_ok=True)
       prefix = 'tmp/'+str(uuid.uuid4())
       if p:
