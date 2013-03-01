@@ -31,7 +31,11 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h2>SERVER REQUIREMENTS:</h2>
+        <h2>ABOUT:</h2>
+
+<p>Collabdraw is an open-source online whiteboard application built to work on desktops and  tablets alike. The user interface is HTML5 (using enyojs), and the backend runs on python tornado and redis.</p>
+
+<h2>SERVER REQUIREMENTS:</h2>
 
 <ol>
 <li>Python 3.2+</li>
@@ -43,34 +47,39 @@ non-python dependencies like cairo, redis)</li>
 </ol><h2>INSTALLATION:</h2>
 
 <ol>
-<li>Clone the git repository 
-<code>
-git clone git://github.com/anandtrex/collabdraw.git
-</code>
+<li>
+<p>Clone the git repository </p>
+
+<pre><code>git clone git://github.com/anandtrex/collabdraw.git
+</code></pre>
 </li>
-<li>Initialize submodules
-<code>
-git submodule init &amp;&amp;
+<li>
+<p>Initialize submodules to get enyojs libraries.</p>
+
+<pre><code>git submodule init
 git submodule update
-</code>
+</code></pre>
 </li>
-<li>Set the hostnames, ports and other options in config.py</li>
+<li><p>Set the hostnames, ports and other options in config.py</p></li>
 </ol><h2>RUNNING:</h2>
 
 <ol>
 <li>Run the redis server</li>
-<li>Run "python main.py"</li>
+<li>Run <code>python main.py</code>
+</li>
 </ol><h2>NOTES:</h2>
 
-<ol>
+<ul>
 <li>All rooms are currently "public". Anyone registered user can join any room, if they know the room name. Private rooms on the way.</li>
-</ol><h2>KNOWN-ISSUES:</h2>
+</ul><h2>KNOWN-ISSUES:</h2>
 
-<ol>
+<ul>
 <li>Doesn't work very well on Android Gingerbread browsers due to limited html5 support</li>
-</ol><h2>DEMO:</h2>
+</ul><h2>DEMO:</h2>
 
-<p><a href="http://collab.cloudapp.net/index.html">http://collab.cloudapp.net/index.html</a></p>
+<ul>
+<li><a href="http://collab.cloudapp.net/index.html">http://collab.cloudapp.net/index.html</a></li>
+</ul>
       </section>
     </div>
 
