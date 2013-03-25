@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source venv/bin/activate
+export PORT=6000
+python main.py > output.log.2 2>&1
