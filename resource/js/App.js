@@ -31,10 +31,8 @@ enyo.kind({
                 this.applyStyle("width", this.owner.canvasWidth + "px");
                 this.applyStyle("height", this.owner.canvasHeight + "px");
                 if (window.location.protocol == 'https:') {
-                    //console.log("Secure connection");
                     var websocketAddress = 'wss://' + this.owner.appIpAddress + ':' + this.owner.appPort + '/realtime/';
                 } else {
-                    //console.log("Normal connectin");
                     var websocketAddress = 'ws://' + this.owner.appIpAddress + ':' + this.owner.appPort + '/realtime/';
                 }
                 if (this.hasNode()) {
@@ -121,19 +119,17 @@ enyo.kind({
             content: "Next",
             ontap: "selectNext"
         }, {
-            kind: "onyx.Button",
-            style: "float: right",
-            content: "Logout",
-            ontap: "logout"
-        }, {
             kind: "onyx.PickerDecorator",
-            style: "float: right;",
             components: [{}, {
                 kind: "onyx.IntegerPicker",
                 name: "currentPage",
                 onSelect: "gotoPage",
                 min: 1,
             }, ],
+        }, {
+            kind: "onyx.Button",
+            content: "Logout",
+            ontap: "logout"
         }, {
             name: "createJoinRoomPopup",
             kind: "onyx.Popup",
@@ -302,7 +298,7 @@ enyo.kind({
         this.$.currentPage.setValue(this.whiteboard.getCurrentPage());
     },
 
-    gotoPage: function(inSender, inEvent){
+    gotoPage: function(inSender, inEvent) {
         this.whiteboard.gotoPage(inEvent.selected.content);
     },
 

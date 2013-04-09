@@ -145,8 +145,10 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         self.room_name = room_name
         self.page_no = page_no
         self.join_room(self.room_name)
-        self.num_pages = int(self.redis_client.get(self.construct_key("info", self.room_name,
-                                                                  "npages")).decode('utf-8'))
+
+        n_pages = self.redis_client.get(self.construct_key("info", self.room_name, "npages"))
+        if n_pages:
+            self.num_pages = int(n_pages.decode('utf-8'))
         # First send the image if it exists
         image_url, width, height = self.get_image_data(self.room_name, self.page_no)
         self.send_message(self.construct_message("image", {'url': image_url,
