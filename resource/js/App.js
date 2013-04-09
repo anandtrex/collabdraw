@@ -37,9 +37,11 @@ enyo.kind({
                 }
                 if (this.hasNode()) {
                     var _this = this;
+                    this.owner.$.loadingPopup.show();
                     this.owner.whiteboard = new WhiteboardSvg(this.node.getAttribute("id"), this.owner.canvasWidth, this.owner.canvasHeight, this.owner.uid, this.owner.room, 1, websocketAddress, function(numPages, currentPage) {
                         _this.owner.$.currentPage.setMax(numPages);
                         _this.owner.$.currentPage.setValue(currentPage);
+                        _this.owner.$.loadingPopup.hide();
                     });
                 }
             },
@@ -163,7 +165,17 @@ enyo.kind({
                 popup: "lightPopup",
                 style: "margin-left: 10px",
             }],
-        }, ]
+        }, {
+            name: "loadingPopup",
+            kind: "onyx.Popup",
+            centered: true,
+            autoDismiss: false,
+            modal: true,
+            floating: true,
+            components: [{
+                kind: "onyx.Spinner"
+            }, ],
+        }]
     }, ],
 
     drawRectangle: function(inSender, inEvent) {
@@ -264,13 +276,17 @@ enyo.kind({
     },
 
     selectNext: function(inSender, inEvent) {
-        this.whiteboard.nextPage();
+        this.$.loadingPopup.show();
+        var result = this.whiteboard.nextPage();
         this.updatePageInfo();
+        if (!result) this.$.loadingPopup.hide();
     },
 
     selectPrevious: function(inSender, inEvent) {
-        this.whiteboard.prevPage();
+        this.$.loadingPopup.show();
+        var result = this.whiteboard.prevPage();
         this.updatePageInfo();
+        if (!result) this.$.loadingPopup.hide();
     },
 
     selectCreateJoinRoomPopupCancel: function(inSender, inEvent) {
