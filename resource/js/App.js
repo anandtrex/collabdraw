@@ -121,6 +121,9 @@ enyo.kind({
             content: "Next",
             ontap: "selectNext"
         }, {
+            style: "width: 50%",
+            content: " "
+        }, {
             kind: "onyx.PickerDecorator",
             components: [{}, {
                 kind: "onyx.IntegerPicker",
@@ -272,7 +275,7 @@ enyo.kind({
     },
 
     selectUpload: function(inSender, inEvent) {
-        window.location = "./upload.html";
+        window.location = "./upload?room=" + this.room;
     },
 
     selectNext: function(inSender, inEvent) {

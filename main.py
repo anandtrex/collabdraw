@@ -36,7 +36,7 @@ class Application(tornado.web.Application):
                 (r'/realtime/', RealtimeHandler),
                 (r'/resource/(.*)', tornado.web.StaticFileHandler,
                     dict(path=config.RESOURCE_DIR)),
-                (r'/upload.html', UploadHandler),
+                (r'/upload', UploadHandler),
                 (r'/login.html', LoginHandler),
                 (r'/logout.html', LogoutHandler),
                 (r'/register.html', RegisterHandler),

@@ -24,6 +24,8 @@ enyo.kind({
                     kind: "onyx.GroupboxHeader",
                     content: "Select a pdf file to upload"
                 }, {
+                    content: "Warning: This will replace the file for this room"
+                }, {
                     kind: "onyx.InputDecorator",
                     components: [{
                         kind: "enyo.Input",
@@ -70,7 +72,7 @@ enyo.kind({
                         name: "uploadStatus",
                         allowHtml: true,
                         content: "Press the upload button to upload",
-                    },],
+                    }, ],
                 }, ],
 
             }, ],
@@ -98,19 +100,19 @@ enyo.kind({
 
         var xhr = new XMLHttpRequest();
         xhr.upload.addEventListener('progress', function(ev) {
-            console.log((ev.loaded * 100 / ev.total) + '%');
             progressBar.setProgress((ev.loaded * 100 / ev.total));
         }, false);
 
         xhr.onreadystatechange = function(ev) {
             if (this.readyState == this.DONE) {
-                console.log("Done");
+                progressBar.setProgress(100);
                 uploadStatus.setContent("File uploaded. <br/> Press back to go back to main page");
             }
         };
         xhr.open('POST', "./upload", true);
         var file = this.$.fileInput.node.files[0];
         var data = new FormData();
+        data.append('room', 'one');
         data.append('file', file);
         xhr.send(data);
     },
@@ -129,7 +131,7 @@ enyo.kind({
         this.$.fileSize.setContent('Size: ' + fileSize);
         this.$.fileType.setContent('Type: ' + file.type);
 
-        if(file.type != "application/pdf"){
+        if (file.type != "application/pdf") {
             this.$.uploadStatus.setContent("<span style='color:red'>Only pdf files allowed <br/> Please select a pdf file</span>");
             this.$.uploadButton.setDisabled(true);
         }
