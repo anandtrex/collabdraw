@@ -68,10 +68,10 @@ enyo.kind({
      * @param {Object} page
      */
     joinRoom: function(room, page) {
-        this.whiteboard.clear(false, false);
+        this.room = room;
         this.singlePath = [];
         this.currentPathLength = 0;
-        this.room = room;
+        this.whiteboard.clear(false, false);
         //console.log("Sending init for room " + room);
         this.sendMessage("init", {
             "room": this.room

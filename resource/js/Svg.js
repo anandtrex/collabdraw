@@ -35,6 +35,7 @@ enyo.kind({
      * @param {Object} room
      */
     joinRoom: function(room) {
+        this.room = room;
         this.connection.joinRoom(room);
     },
 

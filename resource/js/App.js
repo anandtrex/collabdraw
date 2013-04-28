@@ -121,7 +121,7 @@ enyo.kind({
             content: "Next",
             ontap: "selectNext"
         }, {
-            style: "width: 50%",
+            style: "width: 35%",
             content: " "
         }, {
             kind: "onyx.PickerDecorator",
