@@ -6,3 +6,4 @@ resource/touch
 venv
 *.pyc
 *~
+.idea
