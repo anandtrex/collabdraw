@@ -1,9 +1,9 @@
 import logging
+import config
 import hashlib
 
 import cairo
 
-import config
 
 def createCairoContext(w, h):
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
@@ -12,6 +12,7 @@ def createCairoContext(w, h):
     ctx.rectangle(0, 0, w, h)
     ctx.fill()
     return ctx
+
 
 def hexColorToRGB(colorstring):
     logger = logging.getLogger('websocket')
@@ -34,6 +35,7 @@ def hexColorToRGB(colorstring):
     r, g, b = [int(n, 16) for n in (r, g, b)]
     logger.debug("Returning %d, %d, %d" % (r, g, b))
     return (r, g, b)
+
 
 def hash_password(password):
     s = config.HASH_SALT + password

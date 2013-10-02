@@ -40,13 +40,6 @@ enyo.kind({
     },
 
     /**
-     * Ask server to make video of current whiteboard
-     */
-    makeVideo: function() {
-        this.connection.makeVideo();
-    },
-
-    /**
      * Getter for cvs
      */
     getCanvas: function() {

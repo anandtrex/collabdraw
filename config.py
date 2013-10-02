@@ -13,9 +13,10 @@ PUBLIC_LISTEN_PORT = APP_PORT
 REDIS_IP_ADDRESS = 'localhost'
 REDIS_PORT = 6379
 
-# Full path of "bollacboard" directory
+# Full path of "collabdraw" directory
 ROOT_DIR = "/".join(os.path.realpath(__file__).split('/')[:-1])
-RESOURCE_DIR = ROOT_DIR + '/resource'
+RESOURCE_DIR = os.path.join(ROOT_DIR, 'resource')
+HTML_ROOT = os.path.join(RESOURCE_DIR, 'html')
 
 # Hash salt for storing password in database
 HASH_SALT = "bollacboard"
@@ -23,7 +24,7 @@ HASH_SALT = "bollacboard"
 # Enable SSL/TLS
 ENABLE_SSL = False
 SERVER_CERT = os.path.join(os.getcwd(), "server.crt")
-SERVER_KEY = os.path.join(os.getcwd(),"server.key")
+SERVER_KEY = os.path.join(os.getcwd(), "server.key")
 
 # Demo mode disables login requirement
 DEMO_MODE = True
