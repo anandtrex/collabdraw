@@ -9,6 +9,8 @@ APP_PORT = os.environ.get('PORT', 5000)
 # port forwarding is set up
 PUBLIC_LISTEN_PORT = APP_PORT
 
+PUBSUB_CLIENT_TYPE = 'redis' # only redis supported now
+DB_CLIENT_TYPE = 'redis'  # only redis supported now
 # Redis host and port
 REDIS_IP_ADDRESS = 'localhost'
 REDIS_PORT = 6379

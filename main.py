@@ -15,8 +15,13 @@ from org.collabdraw.handler.logouthandler import LogoutHandler
 from org.collabdraw.handler.registerhandler import RegisterHandler
 
 logger = logging.getLogger('websocket')
-logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+ch.setLevel(logging.DEBUG)
+logger.addHandler(ch)
+
 
 class IndexHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -48,9 +53,6 @@ class Application(tornado.web.Application):
             (r'/(.*)', tornado.web.StaticFileHandler,
              dict(path=config.ROOT_DIR)),
         ]
-
-        self.LISTENERS = {}
-        self.LISTENER_THREADS = {}
 
         settings = dict(
             auto_reload=True,

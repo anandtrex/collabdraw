@@ -4,6 +4,9 @@ import tornado.web
 
 
 class LogoutHandler(tornado.web.RequestHandler):
+    def initialize(self):
+        self.logger = logging.getLogger('websocket')
+
     def get(self):
         self.redirect("./login.html")
 
@@ -11,7 +14,6 @@ class LogoutHandler(tornado.web.RequestHandler):
         self.logout()
 
     def logout(self):
-        self.logger = logging.getLogger('websocket')
         loginId = self.get_secure_cookie("loginId")
         self.logger.info("Logging out %s" % loginId)
         self.set_secure_cookie("loginId", "")
