@@ -31,11 +31,13 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h2>ABOUT:</h2>
+        <h2>
+<a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>ABOUT:</h2>
 
 <p>Collabdraw is an open-source online whiteboard application built to work on desktops and  tablets alike. The user interface is HTML5 (using enyojs), and the backend runs on python tornado and redis.</p>
 
-<h2>FEATURES:</h2>
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>FEATURES:</h2>
 
 <ol>
 <li>Works on most tablets out of the box, interface designed for touch interfaces</li>
@@ -44,18 +46,26 @@
 <li>Upload pdf and annotate on whiteboard</li>
 <li>Support for SSL, and authentication</li>
 <li>Fast, handles lots of users simultaneously</li>
-</ol><h2>SERVER REQUIREMENTS:</h2>
+</ol><h2>
+<a name="server-requirements" class="anchor" href="#server-requirements"><span class="octicon octicon-link"></span></a>SERVER REQUIREMENTS:</h2>
 
 <ol>
 <li>Python 3.2+</li>
+<li>Redis server</li>
 <li>All python packages specified in requirements.txt (which might involve installing other
 non-python dependencies like cairo, redis)</li>
-<li>Redis server</li>
-<li>libpoppler, imagemagick for upload functionality</li>
+<li>libpoppler (for pdfseparate), imagemagick (for mogrify) for upload functionality</li>
 <li>ffmpeg to enable video functionality</li>
-</ol><h2>INSTALLATION:</h2>
+</ol><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>INSTALLATION:</h2>
 
 <ol>
+<li>
+<p>Install all system requirements. If on Ubuntu/Debian do:</p>
+
+<pre><code>apt-get install python3 redis-server poppler-utils imagemagick ffmpeg python3-pip git pkg-config libcairo2-dev
+</code></pre>
+</li>
 <li>
 <p>Clone the git repository </p>
 
@@ -65,29 +75,39 @@ non-python dependencies like cairo, redis)</li>
 <li>
 <p>Initialize submodules to get enyojs libraries.</p>
 
-<pre><code>git submodule init
+<pre><code>cd collabdraw
+git submodule init
 git submodule update
 </code></pre>
 </li>
+<li>
+<p>Install python library requirements</p>
+
+<pre><code>pip-3.2 install virtualenv
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+</code></pre>
+</li>
 <li><p>Set the hostnames, ports and other options in config.py</p></li>
-</ol><h2>RUNNING:</h2>
+<li>
+<p>Test if your setup works</p>
+
+<pre><code>collabdraw&gt; ./run_tests.sh
+</code></pre>
+</li>
+</ol><h2>
+<a name="running" class="anchor" href="#running"><span class="octicon octicon-link"></span></a>RUNNING:</h2>
 
 <ol>
-<li>Run the redis server</li>
+<li>Start the redis server (On Ubuntu/Debian, on most setups, this is started automatically on installation)</li>
 <li>Run <code>python main.py</code>
 </li>
-</ol><h2>NOTES:</h2>
+</ol><h2>
+<a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>NOTES:</h2>
 
 <ul>
 <li>All rooms are currently "public". Anyone registered user can join any room, if they know the room name. Private rooms on the way.</li>
-</ul><h2>KNOWN-ISSUES:</h2>
-
-<ul>
-<li>Doesn't work very well on Android Gingerbread browsers due to limited html5 support</li>
-</ul><h2>DEMO:</h2>
-
-<ul>
-<li><a href="http://collab.cloudapp.net/index.html">http://collab.cloudapp.net/index.html</a></li>
 </ul>
       </section>
     </div>
