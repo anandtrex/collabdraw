@@ -44,4 +44,5 @@ class RedisPubSubClient(PubSubInterface):
         self.logger.info("Starting listener thread for topic %s" % topic)
         for message in pubsub_client.listen():
             self.logger.debug("Sending message to topic %s" % topic)
-            listener.send_message(message['data'])
+            if message['type'] == 'message':
+                listener.send_message(message['data'].decode('utf-8'))

@@ -12,6 +12,7 @@ from pystacia import read
 
 from ..dbclient.dbclientfactory import DbClientFactory
 from ..pubsub.pubsubclientfactory import PubSubClientFactory
+from ..tools.videomaker import make_video
 
 
 class RealtimeHandler(tornado.websocket.WebSocketHandler):
@@ -21,9 +22,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     page_no = 1
     num_pages = 1
 
-    def construct_key(self, namespace, key, *keys):
-        return ":".join([str(namespace), str(key)] + list(map(str, keys)))
-
+    # @Override
     def open(self):
         self.logger = logging.getLogger('websocket')
         self.logger.info("Open connection")
@@ -31,6 +30,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         self.pubsub_client = PubSubClientFactory.getPubSubClient(config.PUBSUB_CLIENT_TYPE)
         self.send_message(self.construct_message("ready"))
 
+    # @Override
     def on_message(self, message):
         m = json.loads(message)
         event = m.get('event', '').strip()
@@ -76,36 +76,46 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
                                                                'width': width, 'height': height}))
 
         elif event == "video":
-            self.make_video(self.construct_key(self.room_name, self.page_no))
+            make_video(self.construct_key(self.room_name, self.page_no))
 
         elif event == "new-page":
             self.logger.info("num_pages was %d" % self.num_pages)
             self.db_client.set(self.construct_key("info", self.room_name, "npages"),
-                                  self.num_pages + 1)
+                                  str(self.num_pages + 1))
             self.num_pages += 1
             self.logger.info("num_pages is now %d" % self.num_pages)
             self.init(self.room_name, self.num_pages)
 
+    # @Override
     def on_close(self):
         self.leave_room(self.room_name)
 
-    def construct_message(self, event, data={}):
-        m = json.dumps({"event": event, "data": data})
-        return m
+    ## Higher lever methods
+    def init(self, room_name, page_no):
+        self.logger.info("Initializing %s and %s" % (room_name, page_no))
 
-    def broadcast_message(self, message):
-        self.pubsub_client.publish(self.construct_key(self.room_name, self.page_no), message, self)
+        self.room_name = room_name
+        self.page_no = page_no
+        self.join_room(self.room_name)
 
-    def send_message(self, message):
-        if type(message) == type(b''):
-            # self.logger.info("Decoding binary string")
-            message = message.decode('utf-8')
-        elif type(message) != type(''):
-            # self.logger.info("Converting message from %s to %s" % (type(message),
-            #                                                       type('')))
-            message = str(message)
-        message = b64encode(compress(bytes(quote(message), 'utf-8'), 9))
-        self.write_message(message)
+        n_pages = self.db_client.get(self.construct_key("info", self.room_name, "npages"))
+        if n_pages:
+            self.num_pages = int(n_pages)
+            # First send the image if it exists
+        image_url, width, height = self.get_image_data(self.room_name, self.page_no)
+        self.send_message(self.construct_message("image", {'url': image_url,
+                                                           'width': width, 'height': height}))
+        # Then send the paths
+        p = self.db_client.get(self.construct_key(self.room_name, self.page_no))
+        if p:
+            self.paths = json.loads(p)
+        else:
+            self.paths = []
+            self.logger.info("No data in database")
+        self.send_message(self.construct_message("draw-many",
+                                                 {'datas': self.paths, 'npages': self.num_pages}))
+
+
 
     def leave_room(self, room_name, clear_paths=True):
         self.logger.info("Leaving room %s" % room_name)
@@ -117,29 +127,20 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
         self.logger.info("Joining room %s" % room_name)
         self.pubsub_client.subscribe(self.construct_key(room_name, self.page_no), self)
 
-    def init(self, room_name, page_no):
-        self.logger.info("Initializing %s and %s" % (room_name, page_no))
+    ## Messaging related methods
+    def construct_key(self, namespace, key, *keys):
+        return ":".join([str(namespace), str(key)] + list(map(str, keys)))
 
-        self.room_name = room_name
-        self.page_no = page_no
-        self.join_room(self.room_name)
+    def construct_message(self, event, data={}):
+        m = json.dumps({"event": event, "data": data})
+        return m
 
-        n_pages = self.db_client.get(self.construct_key("info", self.room_name, "npages"))
-        if n_pages:
-            self.num_pages = int(n_pages.decode('utf-8'))
-            # First send the image if it exists
-        image_url, width, height = self.get_image_data(self.room_name, self.page_no)
-        self.send_message(self.construct_message("image", {'url': image_url,
-                                                           'width': width, 'height': height}))
-        # Then send the paths
-        p = self.db_client.get(self.construct_key(self.room_name, self.page_no))
-        if p:
-            self.paths = json.loads(p.decode('utf-8').replace("'", '"'))
-        else:
-            self.paths = []
-            self.logger.info("No data in database")
-        self.send_message(self.construct_message("draw-many",
-                                                 {'datas': self.paths, 'npages': self.num_pages}))
+    def broadcast_message(self, message):
+        self.pubsub_client.publish(self.construct_key(self.room_name, self.page_no), message, self)
+
+    def send_message(self, message):
+        message = b64encode(compress(bytes(quote(str(message)), 'utf-8'), 9))
+        self.write_message(message)
 
     def get_image_data(self, room_name, page_no):
         image_url = os.path.join("files", room_name, str(page_no) + "_image.png")

@@ -17,7 +17,9 @@ class RedisDbClient(DbInterface):
         self.redis_client.set(key, value)
 
     def get(self, key):
-        return self.redis_client.get(key)
+        value =  self.redis_client.get(key)
+        if value:
+            return value.decode('utf-8').replace("'", '"')
 
     def delete(self, key):
         self.redis_client.delete(key)
