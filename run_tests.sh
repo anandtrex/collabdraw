@@ -1,0 +1,3 @@
+pushd test
+nosetests
+popd

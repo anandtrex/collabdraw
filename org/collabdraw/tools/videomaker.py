@@ -21,7 +21,7 @@ def make_video(key):
     os.makedirs(tmp_path, exist_ok=True)
     path_prefix = os.path.join(tmp_path, str(uuid.uuid4()))
     if p:
-        points = json.loads(p.decode('utf-8').replace("'", '"'))
+        points = json.loads(p)
         i = 0
         c = createCairoContext(920, 550)
         for point in points:
