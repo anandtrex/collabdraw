@@ -14,11 +14,10 @@ from .pubsubinterface import PubSubInterface
 
 class RedisPubSubClient(PubSubInterface):
 
-    t = None
+    redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=1)
 
     def __init__(self):
         self.logger = logging.getLogger('websocket')
-        self.redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=1)
         self.pubsub_client = self.redis_client.pubsub()
         self.logger.info("Initialized redis pubsub client")
 
