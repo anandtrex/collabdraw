@@ -22,7 +22,7 @@ class RealtimeHandler(tornado.websocket.WebSocketHandler):
     num_pages = 1
 
     def construct_key(self, namespace, key, *keys):
-        return "-".join([str(namespace), str(key)] + list(map(str, keys)))
+        return ":".join([str(namespace), str(key)] + list(map(str, keys)))
 
     def open(self):
         self.logger = logging.getLogger('websocket')

@@ -9,6 +9,7 @@ import logging
 import config
 from ..tools.tools import hexColorToRGB, createCairoContext
 from ..dbclient.dbclientfactory import DbClientFactory
+from ..tools.tools import delete_files
 
 
 def make_video(key):
@@ -16,7 +17,7 @@ def make_video(key):
     db_client = DbClientFactory.getDbClient(config.DB_CLIENT_TYPE)
 
     p = db_client.get(key)
-    tmp_path = os.path.join(config.ROOT_DIR, "tmp")
+    tmp_path = os.path.abspath("./tmp")
     os.makedirs(tmp_path, exist_ok=True)
     path_prefix = os.path.join(tmp_path, str(uuid.uuid4()))
     if p:
@@ -43,4 +44,4 @@ def make_video(key):
             # Clean up if successful
             cleanup_files = path_prefix + '_img_*'
             logger.info("Cleaning up %s" % cleanup_files)
-            subprocess.call(['rm', cleanup_files])
+            delete_files(cleanup_files)

@@ -1,6 +1,8 @@
 import logging
 import config
 import hashlib
+import os
+import glob
 
 import cairo
 
@@ -40,3 +42,11 @@ def hexColorToRGB(colorstring):
 def hash_password(password):
     s = config.HASH_SALT + password
     return hashlib.md5(s.encode("utf-8")).hexdigest()
+
+def delete_files(pattern):
+    """
+    Works only for files, not directories
+    """
+    filelist = glob.glob(pattern)
+    for f in filelist:
+        os.remove(f)

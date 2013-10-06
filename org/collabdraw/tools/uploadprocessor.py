@@ -7,6 +7,7 @@ import logging
 
 import config
 from ..dbclient.dbclientfactory import DbClientFactory
+from org.collabdraw.tools.tools import delete_files
 
 
 def process_uploaded_file(dir_path, fname, key):
@@ -20,10 +21,8 @@ def process_uploaded_file(dir_path, fname, key):
     # Convert the pdf files to png
     subprocess.call(['mogrify', '-format', 'png', '--', dir_path + '/*image.pdf'])
     # Delete all the files
-    del_files = glob.glob(dir_path + '/*image.pdf')
-    for f in del_files:
-        os.remove(f)
+    delete_files(dir_path + '/*image.pdf')
     logger.info("Finished processing file")
     # Insert the number of pages processed for that room
-    key = "info:%s:npages" % key
-    db_client.set(key, len(glob.glob('files/%s/*.png' % key)))
+    db_key = "info:%s:npages" % key
+    db_client.set(db_key, len(glob.glob(dir_path + '/*.png')))
