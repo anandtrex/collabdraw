@@ -7,3 +7,6 @@
 [submodule "resource/lib/onyx"]
 	path = resource/lib/onyx
 	url = https://github.com/enyojs/onyx.git
+[submodule "collabdraw-heroku-bin"]
+	path = collabdraw-heroku-bin
+	url = https://github.com/anandtrex/collabdraw-heroku-bin.git

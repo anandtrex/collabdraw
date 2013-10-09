@@ -9,7 +9,7 @@ from .dbinterface import DbInterface
 
 
 class RedisDbClient(DbInterface):
-    redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=2)
+    redis_client = redis.from_url(config.REDIS_URL)
 
     def __init__(self):
         self.logger = logging.getLogger('websocket')

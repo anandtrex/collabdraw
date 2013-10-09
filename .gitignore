@@ -1,6 +1,4 @@
-eid_auth.php
 *.swp
-node_modules
 touch
 resource/touch
 venv
