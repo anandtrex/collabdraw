@@ -5,11 +5,12 @@ import logging
 import redis
 
 import config
+import auth
 from .dbinterface import DbInterface
 
 
 class RedisDbClient(DbInterface):
-    redis_client = redis.from_url(config.REDIS_URL)
+    redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=2, password=auth.REDIS_PASSWORD)
 
     def __init__(self):
         self.logger = logging.getLogger('websocket')
