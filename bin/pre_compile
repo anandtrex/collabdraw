@@ -1,49 +1,50 @@
 #!/usr/bin/env bash
 
 INSTALL_DIR=/app
-ROOT_DIR=/app
 
 function install_binary {
   BINARY=$1
   VENDOR=$2
   INSTALL_PATH=$INSTALL_DIR/$VENDOR
-  BINARY_PATH=$ROOT_DIR/$BINARY
   echo "Installing $BINARY to $INSTALL_PATH"
   if [ ! -d "$INSTALL_PATH" ]; then
     mkdir -p $INSTALL_PATH
     echo "Created $INSTALL_PATH"
     echo "Downloading from $BINARY"
-    tar -xz -C $INSTALL_PATH -f $BINARY_PATH
+    curl $BINARY -o - | tar -xz -C $INSTALL_PATH -f -
   fi
 }
 
 
-FFMPEG_BINARY="collabdraw-heroku-bin/ffmpeg.tgz"
+FFMPEG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/ffmpeg.tgz"
 FFMPEG_VENDOR="vendor/ffmpeg"
 
 install_binary $FFMPEG_BINARY $FFMPEG_VENDOR
 
-IMAGEMAGICK_BINARY="collabdraw-heroku-bin/imagemagick.tgz"
+IMAGEMAGICK_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/imagemagick.tgz"
 IMAGEMAGICK_VENDOR="vendor/imagemagick"
 
 install_binary $IMAGEMAGICK_BINARY $IMAGEMAGICK_VENDOR
 
-FONTCONFIG_BINARY="collabdraw-heroku-bin/fontconfig.tgz"
+FONTCONFIG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/fontconfig.tgz"
 FONTCONFIG_VENDOR="vendor/fontconfig-2.10"
 
 install_binary $FONTCONFIG_BINARY $FONTCONFIG_VENDOR
 
-POPPLER_BINARY="collabdraw-heroku-bin/poppler.tgz"
+POPPLER_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/poppler.tgz"
 POPPLER_VENDOR="vendor/poppler"
 
 install_binary $POPPLER_BINARY $POPPLER_VENDOR
 
-CAIRO_BINARY="collabdraw-heroku-bin/cairo.tgz"
+CAIRO_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/cairo.tgz"
 CAIRO_VENDOR="vendor/cairo"
 
 install_binary $CAIRO_BINARY $CAIRO_VENDOR
 
-PIXMAN_BINARY="collabdraw-heroku-bin/pixman.tgz"
+PIXMAN_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/pixman.tgz"
 PIXMAN_VENDOR="vendor/pixman"
 
 install_binary $PIXMAN_BINARY $PIXMAN_VENDOR
+
+SENCHA_ARCHIVE="https://s3.amazonaws.com/heroku-anand/sencha-touch.tgz"
+install_binary $SENCHA_ARCHIVE resource
