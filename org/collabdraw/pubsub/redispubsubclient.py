@@ -14,7 +14,7 @@ from .pubsubinterface import PubSubInterface
 
 class RedisPubSubClient(PubSubInterface):
 
-    redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=0)
+    redis_client = redis.from_url(config.REDIS_URL)
 
     def __init__(self):
         self.logger = logging.getLogger('websocket')
