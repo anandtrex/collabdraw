@@ -45,6 +45,3 @@ PIXMAN_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/pixman.tgz"
 PIXMAN_VENDOR="vendor/pixman"
 
 install_binary $PIXMAN_BINARY $PIXMAN_VENDOR
-
-SENCHA_ARCHIVE="https://s3.amazonaws.com/heroku-anand/sencha-touch.tgz"
-install_binary $SENCHA_ARCHIVE resource
