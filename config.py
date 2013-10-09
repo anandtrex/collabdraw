@@ -16,6 +16,8 @@ DB_CLIENT_TYPE = 'redis'  # only redis supported now
 REDIS_IP_ADDRESS = 'pub-redis-14589.us-east-1-3.1.ec2.garantiadata.com'
 REDIS_PORT = 14589
 
+REDIS_URL = os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')
+
 # Full path of "collabdraw" directory
 ROOT_DIR = "/".join(os.path.realpath(__file__).split('/')[:-1])
 RESOURCE_DIR = os.path.join(ROOT_DIR, 'resource')
