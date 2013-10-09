@@ -10,7 +10,7 @@ from .dbinterface import DbInterface
 
 
 class RedisDbClient(DbInterface):
-    redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=2, password=auth.REDIS_PASSWORD)
+    redis_client = redis.Redis(host=config.REDIS_IP_ADDRESS, port=config.REDIS_PORT, db=0, password=auth.REDIS_PASSWORD)
 
     def __init__(self):
         self.logger = logging.getLogger('websocket')
