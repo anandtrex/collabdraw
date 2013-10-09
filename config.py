@@ -1,7 +1,7 @@
 import os
 
 # App's host and port
-APP_IP_ADDRESS = "192.168.1.134" # Put your websocket endpoint here
+APP_IP_ADDRESS = "collabdraw.herokuapp.com"
 APP_PORT = os.environ.get('PORT', 5000)
 
 # Port in which websocket client should listen
@@ -12,7 +12,9 @@ PUBLIC_LISTEN_PORT = APP_PORT
 PUBSUB_CLIENT_TYPE = 'redis' # only redis supported now
 DB_CLIENT_TYPE = 'redis'  # only redis supported now
 
-REDIS_URL = os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')
+# Redis host and port
+REDIS_IP_ADDRESS = 'pub-redis-14589.us-east-1-3.1.ec2.garantiadata.com'
+REDIS_PORT = 14589
 
 # Full path of "collabdraw" directory
 ROOT_DIR = "/".join(os.path.realpath(__file__).split('/')[:-1])
