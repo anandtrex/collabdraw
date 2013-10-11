@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
 INSTALL_DIR=/app
+ROOT_DIR=/app
 
 function install_binary {
   BINARY=$1
   VENDOR=$2
   INSTALL_PATH=$INSTALL_DIR/$VENDOR
+  BINARY_PATH=$ROOT_DIR/$BINARY
   echo "Installing $BINARY to $INSTALL_PATH"
   if [ ! -d "$INSTALL_PATH" ]; then
     mkdir -p $INSTALL_PATH
     echo "Created $INSTALL_PATH"
     echo "Downloading from $BINARY"
-    curl $BINARY -o - | tar -xz -C $INSTALL_PATH -f -
+    tar -xz -C $INSTALL_PATH -f $BINARY_PATH
   fi
 }
 
