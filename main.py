@@ -15,11 +15,11 @@ from org.collabdraw.handler.logouthandler import LogoutHandler
 from org.collabdraw.handler.registerhandler import RegisterHandler
 
 logger = logging.getLogger('websocket')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 ch = logging.StreamHandler()
 ch.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 logger.addHandler(ch)
 
 

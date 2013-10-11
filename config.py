@@ -1,12 +1,12 @@
 import os
 
 # App's host and port
-APP_IP_ADDRESS = "collabdraw.herokuapp.com"
+APP_IP_ADDRESS = "192.168.1.134" # Put your websocket endpoint here
 APP_PORT = os.environ.get('PORT', 5000)
 
 # Port in which websocket client should listen
-# Usually same ass APP_PORT unless some other
-# port forwarding is set up
+# Usually same as APP_PORT unless some other
+# port forwarding is set up (for ex. if you're using heroku)
 PUBLIC_LISTEN_PORT = 80
 
 PUBSUB_CLIENT_TYPE = 'redis' # only redis supported now
