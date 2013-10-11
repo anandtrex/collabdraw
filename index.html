@@ -1,42 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Collabdraw : HTML5 collaborative whiteboard for tablets" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Collabdraw by anandtrex</title>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Collabdraw</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
+    <div class="wrapper">
+      <header>
+        <h1>Collabdraw</h1>
+        <p>HTML5 collaborative whiteboard for tablets</p>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/anandtrex/collabdraw">View on GitHub</a>
+        <p class="view"><a href="https://github.com/anandtrex/collabdraw">View the Project on GitHub <small>anandtrex/collabdraw</small></a></p>
 
-          <h1 id="project_title">Collabdraw</h1>
-          <h2 id="project_tagline">HTML5 collaborative whiteboard for tablets</h2>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/anandtrex/collabdraw/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/anandtrex/collabdraw/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+        <ul>
+          <li><a href="https://github.com/anandtrex/collabdraw/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/anandtrex/collabdraw/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/anandtrex/collabdraw">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <h2>
 <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>ABOUT:</h2>
 
-<p>Collabdraw is an open-source online whiteboard application built to work on desktops and  tablets alike. The user interface is HTML5 (using enyojs), and the backend runs on python tornado and redis.</p>
+<p>Collabdraw is an open-source online whiteboard application built to work on desktops and  tablets
+alike. The user interface is HTML5 (using enyojs), and the backend runs on python tornado and redis.</p>
 
 <h2>
+<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>DEMO:</h2>
+
+<ul>
+<li><a href="http://collabdraw.herokuapp.com/">http://collabdraw.herokuapp.com/</a></li>
+</ul><h2>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>FEATURES:</h2>
 
 <ol>
@@ -46,6 +49,7 @@
 <li>Upload pdf and annotate on whiteboard</li>
 <li>Support for SSL, and authentication</li>
 <li>Fast, handles lots of users simultaneously</li>
+<li><strong>Runs on heroku out of the box!</strong></li>
 </ol><h2>
 <a name="server-requirements" class="anchor" href="#server-requirements"><span class="octicon octicon-link"></span></a>SERVER REQUIREMENTS:</h2>
 
@@ -89,7 +93,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 </code></pre>
 </li>
-<li><p>Set the hostnames, ports and other options in config.py</p></li>
+<li><p>Set the hostnames, ports and other options in config.py. Most of the options are explained in the
+config file. You need the url that points to your redis server, and the url that points to your
+websocket endpoint</p></li>
 <li>
 <p>Test if your setup works</p>
 
@@ -104,22 +110,44 @@ pip install -r requirements.txt
 <li>Run <code>python main.py</code>
 </li>
 </ol><h2>
+<a name="heroku-deployment" class="anchor" href="#heroku-deployment"><span class="octicon octicon-link"></span></a>HEROKU DEPLOYMENT:</h2>
+
+<ol>
+<li>Create a <a href="http://heroku.com">heroku</a> account, create an app, and add the "Redis cloud" plugin.
+Install heroku toolbelt on your box. Login to heroku with <code>heroku login</code>. You can follow the
+instructions on the <a href="https://devcenter.heroku.com/articles/quickstart">heroku quickstart page</a>
+</li>
+<li>Clone the git repository <code>git clone git://github.com/anandtrex/collabdraw.git &amp;&amp; cd collabdraw</code>
+</li>
+<li>Edit config.py to point to your app. If you use the "Redis cloud" heroku addon, you can leave the
+redis url as it is.</li>
+<li>Add your app as a remote in git with:
+<code>
+heroku git:remote -a &lt;your heroku app name&gt;
+</code>
+</li>
+<li>Run <code>./set_heroku_path.sh</code> to set the LD_LIBRARY_PATH in your heroku app config to point properly
+to ffmpeg</li>
+<li>Run:
+<code>
+git push heroku master
+</code>
+</li>
+<li>Profit!!!</li>
+<li>You can check your heroku installation by logging into the heroku dynamo with <code>heroku run bash</code>, and running <code>./run_tests.sh</code>. If this passes, all's good.</li>
+</ol><h2>
 <a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>NOTES:</h2>
 
 <ul>
 <li>All rooms are currently "public". Anyone registered user can join any room, if they know the room name. Private rooms on the way.</li>
 </ul>
       </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Collabdraw maintained by <a href="https://github.com/anandtrex">anandtrex</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/anandtrex">anandtrex</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-
+    <script src="javascripts/scale.fix.js"></script>
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -130,7 +158,6 @@ pip install -r requirements.txt
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
 
   </body>
 </html>
