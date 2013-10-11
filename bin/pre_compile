@@ -16,32 +16,32 @@ function install_binary {
 }
 
 
-FFMPEG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/ffmpeg.tgz"
+FFMPEG_BINARY="collabdraw-heroku-bin/ffmpeg.tgz"
 FFMPEG_VENDOR="vendor/ffmpeg"
 
 install_binary $FFMPEG_BINARY $FFMPEG_VENDOR
 
-IMAGEMAGICK_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/imagemagick.tgz"
+IMAGEMAGICK_BINARY="collabdraw-heroku-bin/imagemagick.tgz"
 IMAGEMAGICK_VENDOR="vendor/imagemagick"
 
 install_binary $IMAGEMAGICK_BINARY $IMAGEMAGICK_VENDOR
 
-FONTCONFIG_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/fontconfig.tgz"
+FONTCONFIG_BINARY="collabdraw-heroku-bin/fontconfig.tgz"
 FONTCONFIG_VENDOR="vendor/fontconfig-2.10"
 
 install_binary $FONTCONFIG_BINARY $FONTCONFIG_VENDOR
 
-POPPLER_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/poppler.tgz"
+POPPLER_BINARY="collabdraw-heroku-bin/poppler.tgz"
 POPPLER_VENDOR="vendor/poppler"
 
 install_binary $POPPLER_BINARY $POPPLER_VENDOR
 
-CAIRO_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/cairo.tgz"
+CAIRO_BINARY="collabdraw-heroku-bin/cairo.tgz"
 CAIRO_VENDOR="vendor/cairo"
 
 install_binary $CAIRO_BINARY $CAIRO_VENDOR
 
-PIXMAN_BINARY="https://s3.amazonaws.com/heroku-anand/binaries/pixman.tgz"
+PIXMAN_BINARY="collabdraw-heroku-bin/pixman.tgz"
 PIXMAN_VENDOR="vendor/pixman"
 
 install_binary $PIXMAN_BINARY $PIXMAN_VENDOR
