@@ -15,7 +15,7 @@ FEATURES:
 4. Upload pdf and annotate on whiteboard
 5. Support for SSL, and authentication
 6. Fast, handles lots of users simultaneously
-7. *Runs on heroku out of the box!*
+7. **Runs on heroku out of the box!**
 
 SERVER REQUIREMENTS:
 -------------
@@ -62,6 +62,12 @@ websocket endpoint
 collabdraw> ./run_tests.sh
 ```
     
+RUNNING:
+-------------
+1. Start the redis server (On Ubuntu/Debian, on most setups, this is started automatically on installation)
+2. Run `python main.py`
+
+
 HEROKU DEPLOYMENT:
 --------------------
 1. Create a [heroku](http://heroku.com) account, create an app, and add the "Redis cloud" plugin.
@@ -81,11 +87,9 @@ to ffmpeg
 git push heroku master
 ```
 7. Profit!!!
+8. You can check your heroku installation by logging into the heroku dynamo with `heroku run bash`, and running `./run_tests.sh`. If this passes, all's good.
 
-RUNNING:
--------------
-1. Start the redis server (On Ubuntu/Debian, on most setups, this is started automatically on installation)
-2. Run `python main.py`
+
 
 NOTES:
 -------------
