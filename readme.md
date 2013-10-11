@@ -5,20 +5,21 @@ Collabdraw is an open-source online whiteboard application built to work on desk
 FEATURES:
 -------------
 1. Works on most tablets out of the box, interface designed for touch interfaces
-1. Multiple rooms, pages for collaboration
-1. Take quick snapshots of the board
-1. Upload pdf and annotate on whiteboard
-1. Support for SSL, and authentication
-1. Fast, handles lots of users simultaneously
+2. Multiple rooms, pages for collaboration
+3. Take quick snapshots of the board
+4. Upload pdf and annotate on whiteboard
+5. Support for SSL, and authentication
+6. Fast, handles lots of users simultaneously
+7. *Runs on heroku out of the box!*
 
 SERVER REQUIREMENTS:
 -------------
 1. Python 3.2+
-1. Redis server
-1. All python packages specified in requirements.txt (which might involve installing other
+2. Redis server
+3. All python packages specified in requirements.txt (which might involve installing other
 non-python dependencies like cairo, redis)
-1. libpoppler (for pdfseparate), imagemagick (for mogrify) for upload functionality
-1. ffmpeg to enable video functionality
+4. libpoppler (for pdfseparate), imagemagick (for mogrify) for upload functionality
+5. ffmpeg to enable video functionality
 
 INSTALLATION:
 -------------
@@ -47,17 +48,39 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Set the hostnames, ports and other options in config.py
+5. Set the hostnames, ports and other options in config.py. Most of the options are explained in the
+config file. You need the url that points to your redis server, and the url that points to your
+websocket endpoint
 
 6. Test if your setup works
 ```
 collabdraw> ./run_tests.sh
 ```
     
+HEROKU DEPLOYMENT:
+--------------------
+1. Create a [heroku](http://heroku.com) account, create an app, and add the "Redis cloud" plugin.
+Install heroku toolbelt on your box. Login to heroku with `heroku login`. You can follow the
+instructions on the [heroku quickstart page](https://devcenter.heroku.com/articles/quickstart)
+2. Clone the git repository `git clone git://github.com/anandtrex/collabdraw.git && cd collabdraw`
+3. Edit config.py to point to your app. If you use the "Redis cloud" heroku addon, you can leave the
+redis url as it is.
+4. Add your app as a remote in git with:
+```
+heroku git:remote -a <your heroku app name>
+```
+5. Run `./set_heroku_path.sh` to set the LD_LIBRARY_PATH in your heroku app config to point properly
+to ffmpeg
+6. Run:
+```
+git push heroku master
+```
+7. Profit!!!
+
 RUNNING:
 -------------
 1. Start the redis server (On Ubuntu/Debian, on most setups, this is started automatically on installation)
-1. Run `python main.py`
+2. Run `python main.py`
 
 NOTES:
 -------------
