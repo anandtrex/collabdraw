@@ -12,10 +12,6 @@ PUBLIC_LISTEN_PORT = 80
 PUBSUB_CLIENT_TYPE = 'redis' # only redis supported now
 DB_CLIENT_TYPE = 'redis'  # only redis supported now
 
-# Redis host and port
-REDIS_IP_ADDRESS = 'pub-redis-14589.us-east-1-3.1.ec2.garantiadata.com'
-REDIS_PORT = 14589
-
 REDIS_URL = os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')
 
 # Full path of "collabdraw" directory
