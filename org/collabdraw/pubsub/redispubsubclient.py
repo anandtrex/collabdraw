@@ -32,7 +32,7 @@ class RedisPubSubClient(PubSubInterface):
 
         if self.t:
             self.pubsub_client.unsubscribe(topic)
-            self.t.join()
+            self.t.join(60)
 
     def publish(self, topic, message, publisher):
         self.logger.debug("Publishing to topic %s" % topic)

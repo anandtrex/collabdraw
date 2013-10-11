@@ -7,7 +7,7 @@ APP_PORT = os.environ.get('PORT', 5000)
 # Port in which websocket client should listen
 # Usually same as APP_PORT unless some other
 # port forwarding is set up (for ex. if you're using heroku)
-PUBLIC_LISTEN_PORT = 80
+PUBLIC_LISTEN_PORT = APP_PORT
 
 PUBSUB_CLIENT_TYPE = 'redis' # only redis supported now
 DB_CLIENT_TYPE = 'redis'  # only redis supported now
