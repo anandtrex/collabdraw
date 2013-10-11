@@ -1,6 +1,11 @@
 ABOUT:
 -------------
-Collabdraw is an open-source online whiteboard application built to work on desktops and  tablets alike. The user interface is HTML5 (using enyojs), and the backend runs on python tornado and redis.
+Collabdraw is an open-source online whiteboard application built to work on desktops and  tablets
+alike. The user interface is HTML5 (using enyojs), and the backend runs on python tornado and redis.
+
+DEMO:
+------------
+* [http://collabdraw.herokuapp.com/](http://collabdraw.herokuapp.com/)
 
 FEATURES:
 -------------
