@@ -104,33 +104,7 @@ websocket endpoint</p></li>
 <li>Start the redis server (On Ubuntu/Debian, on most setups, this is started automatically on installation)</li>
 <li>Run <code>python main.py</code>
 </li>
-</ol><h2>
-<a name="heroku-deployment" class="anchor" href="#heroku-deployment"><span class="octicon octicon-link"></span></a>HEROKU DEPLOYMENT:</h2>
-
-<ol>
-<li>Create a <a href="http://heroku.com">heroku</a> account, create an app, and add the "Redis cloud" plugin.
-Install heroku toolbelt on your box. Login to heroku with <code>heroku login</code>. You can follow the
-instructions on the <a href="https://devcenter.heroku.com/articles/quickstart">heroku quickstart page</a>
-</li>
-<li>Clone the git repository <code>git clone git://github.com/anandtrex/collabdraw.git &amp;&amp; cd collabdraw</code>
-</li>
-<li>Edit config.py to point to your app. If you use the "Redis cloud" heroku addon, you can leave the
-redis url as it is.</li>
-<li>Add your app as a remote in git with:
-<code>
-heroku git:remote -a &lt;your heroku app name&gt;
-</code>
-</li>
-<li>Run <code>./set_heroku_path.sh</code> to set the LD_LIBRARY_PATH in your heroku app config to point properly
-to ffmpeg</li>
-<li>Run:
-<code>
-git push heroku master
-</code>
-</li>
-<li>Profit!!!</li>
-<li>You can check your heroku installation by logging into the heroku dynamo with <code>heroku run bash</code>, and running <code>./run_tests.sh</code>. If this passes, all's good.</li>
-</ol><h2>
+</ol>><h2>
 <a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>NOTES:</h2>
 
 <ul>
