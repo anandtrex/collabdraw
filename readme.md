@@ -1,4 +1,4 @@
-[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+[![Maintenance](https://img.shields.io/badge/maintained%3F-no!-red.svg?style=flat)]()
 
 
 ABOUT:
