@@ -1,4 +1,4 @@
-decorator==3.4.0
+decorator==4.4.0
 pystacia==0.1
 redis==2.7.2
 six==1.2.0
