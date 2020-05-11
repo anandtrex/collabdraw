@@ -1,6 +1,6 @@
 decorator==3.4.0
 pystacia==0.1
-redis==2.7.2
+redis==3.5.1
 six==1.2.0
 tornado==2.4.1
 git+http://anongit.freedesktop.org/git/pycairo
